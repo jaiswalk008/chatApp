@@ -33,7 +33,7 @@ server.use((req, res) => {
 function startServer() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield database_1.default.sync();
+            yield database_1.default.sync({ force: true });
             server.listen(process.env.PORT || 4000);
         }
         catch (err) {
