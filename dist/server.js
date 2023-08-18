@@ -21,7 +21,10 @@ dotenv_1.default.config();
 const path_1 = __importDefault(require("path"));
 const user_1 = __importDefault(require("./Routes/user"));
 const server = (0, express_1.default)();
-server.use((0, cors_1.default)());
+server.use((0, cors_1.default)({
+    origin: "http://127.0.0.1:5500",
+    methods: ["GET", "POST", "DELETE"]
+}));
 server.use(body_parser_1.default.json());
 server.use('/addUser', user_1.default);
 server.use((req, res) => {

@@ -13,7 +13,7 @@ export const addUser = async (req:Request,res : Response) =>{
             res.status(409).json({message:"A user is already registered with this e-mail address"});
         }
         else if(checkPhone){
-            res.status(409).json({message:"A user is already registered with this Phone Number"});
+            res.status(409).json({message:"A user is already registered with this Phone NumberT"});
         }
         else{
             const saltRounds = 10;

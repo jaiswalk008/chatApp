@@ -7,7 +7,10 @@ env.config();
 import path from 'path';
 import userRoutes from './Routes/user';
 const server = express();
-server.use(cors());
+server.use(cors({
+    origin:"http://127.0.0.1:5500",
+    methods:["GET","POST","DELETE"]
+}));
 server.use(bodyParser.json());
 
 server.use('/addUser',userRoutes);
