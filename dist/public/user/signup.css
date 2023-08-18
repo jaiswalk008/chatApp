@@ -1,0 +1,52 @@
+.container{
+    border: 1.5px solid #20232B;
+    width: 400px;
+    border-radius: 10px;
+    background-color: #28314a;
+    color: #eaecd0;
+}
+.btn{
+    background-color: #8b8beb;
+}
+.btn:hover{
+    background-color: #3434c7;
+    color: #f0f1e2;
+    
+}
+.message{
+    text-align: center;
+    color: #e1f31f;
+    display: none;
+}
+body{
+    color: beige;
+    
+    background: linear-gradient(0deg, #20232B 20%, #9090c1 );
+
+}
+hr:not([size]){
+    color: #20232B;
+    height: 2px;
+   
+}
+html,body{
+    height: 100%;
+}
+.weConnect {
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: 500;
+    padding: 1rem 0;
+    text-align: center; 
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3); /* Adding text shadow */
+
+}   
+a{
+    text-decoration: none;
+    color: #e1f31f;
+}
+a:hover{
+    text-decoration: underline;
+    
+    color: #e1f31f;
+}
