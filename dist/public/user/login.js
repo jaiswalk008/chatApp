@@ -8,24 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const signupForm = document.querySelector('.form');
-signupForm.addEventListener('submit', signup);
-const url1 = 'http://localhost:4000/';
-function signup(e) {
+const loginForm = document.querySelector('.form');
+loginForm.addEventListener('submit', login);
+const url2 = 'http://localhost:4000/';
+function login(e) {
     return __awaiter(this, void 0, void 0, function* () {
         e.preventDefault();
         const formElement = e.target;
-        const userDetails = {
-            username: formElement.username.value,
+        const loginDetails = {
             email: formElement.email.value,
-            phone: parseInt(formElement.phone.value),
             password: formElement.password.value
         };
+        console.log(loginDetails);
         try {
-            const res = yield axios.post(url1 + 'signup', userDetails);
-            console.log(res.data.userDetails);
-            signupForm.reset();
-            window.location.replace('/dist/public/user/login.html');
+            const res = yield axios.post(url2 + 'login', loginDetails);
+            console.log(res.data);
+            localStorage.setItem('token', res.data.token);
+            loginForm.reset();
+            alert('logged in successfully');
         }
         catch (err) {
             console.log(err);

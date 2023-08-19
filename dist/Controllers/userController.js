@@ -12,12 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addUser = void 0;
+exports.login = exports.addUser = void 0;
 const user_1 = __importDefault(require("../Models/user"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const addUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userDetails = Object.assign({}, req.body);
+        console.log(userDetails);
         const checkEmail = yield user_1.default.findOne({ where: { email: userDetails.email } });
         const checkPhone = yield user_1.default.findOne({ where: { phone: userDetails.phone } });
         console.log(userDetails);
@@ -45,3 +47,34 @@ const addUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.addUser = addUser;
+function generateToken(id) {
+    return jsonwebtoken_1.default.sign({ userID: id }, process.env.JWT_SECRET_KEY);
+}
+const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const loginDetails = Object.assign({}, req.body);
+    // console.log(loginDetails);
+    try {
+        const user = yield user_1.default.findOne({ where: { email: loginDetails.email } });
+        // console.log(user);
+        if (user) {
+            bcryptjs_1.default.compare(loginDetails.password, user.password, (err, result) => {
+                if (err)
+                    res.status(500).json({ message: "Something went wrong" });
+                else if (result === true) {
+                    res.status(200).json({ message: 'Login Successful', token: generateToken(user.id) });
+                }
+                else {
+                    res.status(401).json({ message: "User not authorized" });
+                }
+            });
+        }
+        else {
+            res.status(404).json({ message: "User not found :(" });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+exports.login = login;

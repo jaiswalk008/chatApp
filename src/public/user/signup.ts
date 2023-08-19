@@ -1,9 +1,8 @@
 
-const form = document.querySelector('.form') as HTMLFormElement;
-form.addEventListener('submit',signup);
-
-declare const axios: any;
-const url='http://localhost:4000/';
+const signupForm = document.querySelector('.form') as HTMLFormElement;
+signupForm.addEventListener('submit',signup);
+declare var axios: any;
+const url1='http://localhost:4000/';
 interface UserInterface{
     username:string;
     email:string;
@@ -22,12 +21,13 @@ async function signup(e: Event){
         password:formElement.password.value
     }
     try{
-        const res=await axios.post(url+'addUser',userDetails);
+        const res=await axios.post(url1+'signup',userDetails);
         console.log(res.data.userDetails);
-        form.reset();
+        signupForm.reset();
         window.location.replace('/dist/public/user/login.html')
     }
     catch(err:any){
+        console.log(err);
         const message = err.response.data.message;
         const messageHeader = document.querySelector('.message') as HTMLHeadingElement;
         

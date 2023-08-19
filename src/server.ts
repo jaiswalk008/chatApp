@@ -1,11 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import env from 'dotenv';
+import  dotenv from 'dotenv';
+dotenv.config();
 import sequelize from './util.js/database';
-env.config();
+
 import path from 'path';
 import userRoutes from './Routes/user';
+
 const server = express();
 server.use(cors({
     origin:"http://127.0.0.1:5500",
@@ -13,10 +15,10 @@ server.use(cors({
 }));
 server.use(bodyParser.json());
 
-server.use('/addUser',userRoutes);
-server.use((req,res) =>{
-    res.sendFile(path.join(__dirname,`public${req.url}`));
-});
+server.use(userRoutes);
+// server.use((req,res) =>{
+//     res.sendFile(path.join(__dirname,`public${req.url}`));
+// });
 
 async function startServer (){
     try{

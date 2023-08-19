@@ -16,9 +16,8 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const database_1 = __importDefault(require("./util.js/database"));
 dotenv_1.default.config();
-const path_1 = __importDefault(require("path"));
+const database_1 = __importDefault(require("./util.js/database"));
 const user_1 = __importDefault(require("./Routes/user"));
 const server = (0, express_1.default)();
 server.use((0, cors_1.default)({
@@ -26,14 +25,14 @@ server.use((0, cors_1.default)({
     methods: ["GET", "POST", "DELETE"]
 }));
 server.use(body_parser_1.default.json());
-server.use('/addUser', user_1.default);
-server.use((req, res) => {
-    res.sendFile(path_1.default.join(__dirname, `public${req.url}`));
-});
+server.use(user_1.default);
+// server.use((req,res) =>{
+//     res.sendFile(path.join(__dirname,`public${req.url}`));
+// });
 function startServer() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield database_1.default.sync({ force: true });
+            yield database_1.default.sync();
             server.listen(process.env.PORT || 4000);
         }
         catch (err) {

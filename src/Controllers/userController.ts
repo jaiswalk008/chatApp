@@ -2,10 +2,13 @@ import User from "../Models/user";
 import { Request, Response } from "express";
 import { UserInterface } from "../Models/interface";
 import bcrypt from 'bcryptjs';
+
+import jwt from'jsonwebtoken';
 export const addUser = async (req:Request,res : Response) =>{
     try {
         
-        const userDetails = {...req.body as UserInterface};
+        const userDetails:UserInterface = {...req.body};
+        console.log(userDetails);
         const checkEmail = await User.findOne({where :{email:userDetails.email}});
         const checkPhone = await User.findOne({where :{phone:userDetails.phone}});
         console.log(userDetails);
@@ -32,4 +35,32 @@ export const addUser = async (req:Request,res : Response) =>{
         res.status(500).json({message:"Internal Server Error"});
     }
 
+}
+function generateToken(id:number){
+    return jwt.sign({userID: id},process.env.JWT_SECRET_KEY);
+}
+export const login = async (req:Request , res: Response)=>{
+    const loginDetails:UserInterface = {...req.body};
+    // console.log(loginDetails);
+    try{
+        const user:any = await User.findOne({where:{email: loginDetails.email}});
+        // console.log(user);
+        if(user){
+            bcrypt.compare(loginDetails.password , user.password, (err,result)=>{
+                if(err) res.status(500).json({message:"Something went wrong"});
+                else if(result===true){
+                    res.status(200).json({message:'Login Successful',token:generateToken(user.id)});
+                }
+                else{
+                    res.status(401).json({message:"User not authorized"});
+                }
+            })
+        }
+        else{
+            res.status(404).json({message:"User not found :("});
+        }
+    }catch(error){
+        console.log(error);
+        res.status(500).json({message:"Internal Server Error"});
+    }
 }

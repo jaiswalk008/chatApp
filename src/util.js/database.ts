@@ -1,4 +1,4 @@
-import  {Sequelize}  from "sequelize";
-const sequelize = new Sequelize('chatapp', 'root','karan123', {dialect:"mysql" , host:process.env.DB_HOST} );
+import {Sequelize}  from "sequelize";
 
+const sequelize = new Sequelize(process.env.DATABASE_NAME, process.env.DATABASE_USER,process.env.DATABASE_PASSWORD, {dialect:"mysql" , host:process.env.DB_HOST} );
 export default sequelize;
