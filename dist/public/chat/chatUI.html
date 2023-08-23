@@ -11,30 +11,59 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 </head>
 <body>
+    
     <navbar class="mt-1">
         <h4 class="p-3 weConnect">weConnect</h4><hr>
     </navbar>
     <div class="container-fluid h-75 d-flex justify-content-start ">
         
-        <div class="container user-list w-25 d-flex justify-content-start flex-column" >
-            <input type="text" class="form-control  mb-1 form-control-lg" onchange="searchUser()" id="search-user" name="search-user" placeholder="search">
+        <div class="container user-list w-25 d-flex justify-content-start flex-column" >    
+            <div class="d-flex ">
+                <input type="text" class="form-control form-control-lg mb-1 " onchange="searchUser()" id="search-user" name="search-user" placeholder="search">
+                <div >
+                    <button type="button" class="btn m-1 btn-primary " onclick="showUsersList()" data-bs-toggle="modal" data-bs-target="#new-chat">
+                        New</i>
+                      </button>
+                    <div class="modal fade " id="new-chat" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog ">
+                            <div class="modal-content bg-dark">
+                              <div class="modal-header bg-danger d-flex">
+                                <h5 class="modal-title" id="exampleModalLabel">Users:</h5>
+                                <button class="btn btn-dark" onclick="addNewGroup()">new group</button>
+                              </div>
+                                <div class="active-user-list">
+                                    <li>karan</li>
+                                    <li>shivam</li>
+                                    <li>keshaw</li>
+                                    <li>revi</li>
+                                </div>
+                                  <div class="modal-footer">
+                                    <button type="button" id="close" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                   
+                                  </div>
+                              </form>
+                              
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="d-flex flex-column">
+                <header class="text-white fw-bold fs-5">Chats</header>
             <button class="btn active">New Group 1</button>
-            <button class="btn">New Group 1</button>
-            <button class="btn">New Group 1</button>
-            <button class="btn">New Group 1</button>
-            <i class="bi bi-send-fill"></i>
+
+            <!-- <i class="bi bi-send-fill"></i> -->
             </div>
         </div>
         <div class="container conversation w-75">
             <div class="container-fluid  text-light chat-name"><i class="bi bi-people-fill"></i>New Group 1</div>
-            <div class="h-75 container chat d-flex justify-content-start  flex-column ">
-                <p class="joined">karan joined</p>
-                <p class="my-message">You: Hi</p>
-                <p class="joined">shivam joined</p>
+                <div class="h-75 container chat d-flex justify-content-start  flex-column ">
+                <div class="d-flex align-items-center flex-column"><p class="joined">karan joined</p></div>
+                <div><p class="my-message">you: I am good</p></div>
+                <div class="d-flex align-items-center flex-column"><p class="joined">Shivam joined</p></div>
                 <p class="message">shivam: Hello Karan!!</p>
                 <p class="message">shivam: How are you?</p>
-                <p class="my-message">you: I am good</p>
+                <div><p class="my-message">you: I am good</p></div>
             </div>
             <div class="container d-flex">
                 <input type="text" class="form-control text-white" name="enter-message" id="enter-message" placeholder="Send a message">
@@ -43,5 +72,6 @@
         </div>
         
     </div>
+    <script src="chat.js"></script>
 </body>
 </html>

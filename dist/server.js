@@ -19,12 +19,25 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const database_1 = __importDefault(require("./util.js/database"));
 const user_1 = __importDefault(require("./Routes/user"));
+const user_2 = __importDefault(require("./Models/user"));
+const message_1 = __importDefault(require("./Models/message"));
+const chat_1 = __importDefault(require("./Models/chat"));
+const group_1 = __importDefault(require("./Models/group"));
+const userGroup_1 = __importDefault(require("./Models/userGroup"));
 const server = (0, express_1.default)();
 server.use((0, cors_1.default)({
     origin: "http://127.0.0.1:5500",
     methods: ["GET", "POST", "DELETE"]
 }));
 server.use(body_parser_1.default.json());
+message_1.default.hasOne(chat_1.default);
+chat_1.default.hasOne(message_1.default);
+user_2.default.hasMany(message_1.default);
+message_1.default.belongsTo(user_2.default);
+// In the User model
+user_2.default.belongsToMany(group_1.default, { through: userGroup_1.default, as: 'groups', foreignKey: 'userId' });
+// In the Group model
+group_1.default.belongsToMany(user_2.default, { through: userGroup_1.default, as: 'members', foreignKey: 'groupId' });
 server.use(user_1.default);
 // server.use((req,res) =>{
 //     res.sendFile(path.join(__dirname,`public${req.url}`));

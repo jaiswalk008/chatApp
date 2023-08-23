@@ -3,6 +3,10 @@
 html,body{
     height: 100%;
 }
+.active-user-list{
+    text-align: left;
+    margin: 10px;
+}
 .weConnect {
     color: #ffffff;
     font-size: 2.2rem;
@@ -35,29 +39,39 @@ html,body{
     background-color: #353a47;
 }
 .message{
-    padding: 0 5px;
+    padding: 3px 5px;
     border: 2px solid #353a47;
     border-radius: 10px;
     width: fit-content;
+    margin: 5px 0;
 }
 .my-message{
-    padding: 0 5px;
+    padding: 3px 5px;
     border: 2px solid #353a47;
     background-color:#353a47 ;
     border-radius: 10px;
-    width: fit-content;
+    width: fit-content; 
+    float: right !important;
+    margin: 5px 0;
 }
-.btn-danger{
-    background-color:rgb(160, 160, 20) !important ;
+.modal-header >button:hover{
+    background-color: #606060;
+}
+.bg-danger,.btn-danger{
+    background-color:rgb(255, 128, 0) !important ;
     border: #20232B;
+}
+#close:hover{
+    background-color:rgb(234, 155, 75) !important;
 }
 .joined{
     /* text-align: center; */
-    background-color: rgb(160, 160, 20);
+    color: rgb(255, 183, 0);
+    background-color: #353a47;
     width: fit-content;
     margin: 10px 0;
     border-radius: 5px;
-    padding: 2px;
+    padding: 2px 7px;
 }
 #group:hover{
     background-color: #343741;
@@ -73,11 +87,7 @@ html,body{
     background-color: #20232B;
     border: 1px solid black;
     border-radius: 15px;
-   
     padding: 0;
-   
-    
-     
 }
 .chat-name{
     min-height: 40px;
@@ -94,7 +104,6 @@ html,body{
     margin: 10px;
     color: #20232B;
     font-size: 1.5rem;
-    /* background-color: #20232B; */
 }
 .chat{
     overflow-y: hidden;
