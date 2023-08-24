@@ -41,6 +41,7 @@ const Message = database_1.default.define('message', {
     },
     recieverId: {
         type: sequelize_1.default.INTEGER,
+        defaultValue: 1,
         allowNull: false
     }
 });

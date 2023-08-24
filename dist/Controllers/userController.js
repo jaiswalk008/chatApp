@@ -61,7 +61,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 if (err)
                     res.status(500).json({ message: "Something went wrong" });
                 else if (result === true) {
-                    res.status(200).json({ message: 'Login Successful', token: generateToken(user.id) });
+                    res.status(200).json({ message: 'Login Successful', username: user.username, token: generateToken(user.id) });
                 }
                 else {
                     res.status(401).json({ message: "User not authorized" });

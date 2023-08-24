@@ -23,9 +23,10 @@ function login(e) {
         try {
             const res = yield axios.post(url2 + 'login', loginDetails);
             console.log(res.data);
+            localStorage.setItem('username', res.data.username);
             localStorage.setItem('token', res.data.token);
             loginForm.reset();
-            alert('logged in successfully');
+            window.location.replace('/dist/public/chat/chatUI.html');
         }
         catch (err) {
             console.log(err);

@@ -15,6 +15,7 @@ const Message = sequelize.define('message',{
     },
     recieverId:{
         type:Sequelize.INTEGER,
+        defaultValue:1,
         allowNull:false
     }
 

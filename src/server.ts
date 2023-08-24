@@ -7,12 +7,13 @@ import sequelize from './util.js/database';
 
 import path from 'path';
 import userRoutes from './Routes/user';
+import chatRoutes from './Routes/chat';
 
 import User from './Models/user';
 import Message from './Models/message';
-import Chat from './Models/chat';
-import Group from './Models/group';
-import UserGroup from './Models/userGroup';
+// import Chat from './Models/chat';
+// import Group from './Models/group';
+// import UserGroup from './Models/userGroup';
 const server = express();
 server.use(cors({
     origin:"http://127.0.0.1:5500",
@@ -20,20 +21,20 @@ server.use(cors({
 }));
 server.use(bodyParser.json());
 
-Message.hasOne(Chat);
-Chat.hasOne(Message)
+// Message.hasOne(Chat);
+// Chat.hasOne(Message)
 
 User.hasMany(Message);
 
 Message.belongsTo(User);
 // In the User model
-User.belongsToMany(Group, { through: UserGroup, as: 'groups', foreignKey: 'userId' });
+// User.belongsToMany(Group, { through: UserGroup, as: 'groups', foreignKey: 'userId' });
 
-// In the Group model
-Group.belongsToMany(User, { through: UserGroup, as: 'members', foreignKey: 'groupId' });
+// // In the Group model
+// Group.belongsToMany(User, { through: UserGroup, as: 'members', foreignKey: 'groupId' });
 
 server.use(userRoutes);
-
+server.use(chatRoutes);
 // server.use((req,res) =>{
 //     res.sendFile(path.join(__dirname,`public${req.url}`));
 // });
@@ -41,7 +42,7 @@ server.use(userRoutes);
 
 async function startServer (){
     try{
-        await sequelize.sync();
+        await sequelize.sync({force:false});
         server.listen(process.env.PORT || 4000);
     }catch(err){console.log(err as string);}
 }

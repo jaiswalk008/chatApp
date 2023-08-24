@@ -6,10 +6,12 @@ import { Response,NextFunction } from "express";
 const authenticate = async (req:any,res:Response,next:NextFunction) =>{
     try{
         const token = req.header('Authorization');
-         
+        
         const result:any = jwt.verify(token, process.env.JWT_SECRET_KEY);
         // console.log('userId :' + result.userId);
-        const user = await User.findByPk(result.userId);
+       
+        const user = await User.findByPk(result.userID);
+       
         req.user = user;
         next();
     }

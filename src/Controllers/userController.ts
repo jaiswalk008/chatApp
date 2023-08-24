@@ -49,7 +49,7 @@ export const login = async (req:Request , res: Response)=>{
             bcrypt.compare(loginDetails.password , user.password, (err,result)=>{
                 if(err) res.status(500).json({message:"Something went wrong"});
                 else if(result===true){
-                    res.status(200).json({message:'Login Successful',token:generateToken(user.id)});
+                    res.status(200).json({message:'Login Successful',username:user.username,token:generateToken(user.id)});
                 }
                 else{
                     res.status(401).json({message:"User not authorized"});

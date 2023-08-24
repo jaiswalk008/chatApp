@@ -20,7 +20,7 @@ const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         const token = req.header('Authorization');
         const result = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET_KEY);
         // console.log('userId :' + result.userId);
-        const user = yield user_1.default.findByPk(result.userId);
+        const user = yield user_1.default.findByPk(result.userID);
         req.user = user;
         next();
     }
