@@ -42,7 +42,7 @@ const getMessages = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     try {
         const messages = yield message_1.default.findAll({
             include: [
-                { model: user_1.default, attributes: ['id', 'username'] } // Include user and select specific attributes
+                { model: user_1.default, attributes: ['id', 'username'] }
             ]
         });
         res.status(200).json({ messages: messages });

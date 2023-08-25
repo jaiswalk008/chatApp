@@ -29,20 +29,33 @@ async function sendMessage(e:Event){
         const res = await axios.post('http://localhost:4000/sendMessage',chatMessage,{
             headers:{Authorization:token}
         });
-        showMessage(res.data.message);
+        showMessage([res.data.message , username]);
         messageForm.reset();
     } catch (error) {
         console.log(error);
     }
 
 }
-function showMessage(text:string){
-    
+function showMessage(data:Array<string>){
+    const newDiv = document.createElement('div');
+    let classname="message";
+    if(data[1]==username) {
+        classname = "my-message";
+        data[1]="you";
+    }
+    newDiv.innerHTML=`<p class="${classname}">${data[1]}: ${data[0]}</p>`;
+    chatContainer.appendChild(newDiv);
+
 }
 window.addEventListener('DOMContentLoaded',async () =>{
     try {
         const res = await axios.get('http://localhost:4000/getMessages');
-        console.log(res.data.messages);
+        // console.log(res.data.messages);
+        res.data.messages.filter((element: any) => {
+            showMessage([element.content, element.user.username]);
+            
+        });        
+        
     } catch (error) {
         console.log(error);
     }

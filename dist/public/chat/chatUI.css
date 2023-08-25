@@ -44,6 +44,7 @@ html,body{
     border-radius: 10px;
     width: fit-content;
     margin: 5px 0;
+    float: left;
 }
 .my-message{
     padding: 3px 5px;
