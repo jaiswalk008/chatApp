@@ -36,7 +36,7 @@ function sendMessage(e) {
             const res = yield axios.post('http://localhost:4000/sendMessage', chatMessage, {
                 headers: { Authorization: token }
             });
-            showMessage([res.data.message, username]);
+            // showMessage([res.data.message , username]);
             messageForm.reset();
         }
         catch (error) {
@@ -44,26 +44,41 @@ function sendMessage(e) {
         }
     });
 }
-function showMessage(data) {
-    const newDiv = document.createElement('div');
-    let classname = "message";
-    if (data[1] == username) {
-        classname = "my-message";
-        data[1] = "you";
+function showMessage() {
+    chatContainer.innerHTML = '';
+    const storedMessageArray = localStorage.getItem('messageArray');
+    if (storedMessageArray) {
+        const parsedMessageArray = JSON.parse(storedMessageArray);
+        parsedMessageArray.filter(element => {
+            const newDiv = document.createElement('div');
+            let classname = "message";
+            if (element[2] == username) {
+                classname = "my-message";
+                element[2] = "you";
+            }
+            newDiv.innerHTML = `<p class="${classname}">${element[2]}: ${element[1]}</p>`;
+            chatContainer.appendChild(newDiv);
+        });
     }
-    newDiv.innerHTML = `<p class="${classname}">${data[1]}: ${data[0]}</p>`;
-    chatContainer.appendChild(newDiv);
 }
 function start() {
+    let lastMessageId = -1;
+    const messageArray = [];
     setInterval(function getMessages() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const res = yield axios.get('http://localhost:4000/getMessages');
+                const res = yield axios.get(`http://localhost:4000/getMessages?lastMessageId=${lastMessageId}`);
                 // console.log(res.data.messages);
-                chatContainer.innerHTML = '';
+                // lastMessageId = res.data.messages.At(-1).id;
                 res.data.messages.filter((element) => {
-                    showMessage([element.content, element.user.username]);
+                    // showMessage([element.content, element.user.username]);
+                    lastMessageId = element.id;
+                    messageArray.push([element.id, element.content, element.user.username]);
                 });
+                while (messageArray.length > 10)
+                    messageArray.shift();
+                localStorage.setItem('messageArray', JSON.stringify(messageArray));
+                showMessage();
             }
             catch (error) {
                 console.log(error);

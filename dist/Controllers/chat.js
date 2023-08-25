@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMessages = exports.sendMessage = exports.getUserList = void 0;
 const message_1 = __importDefault(require("../Models/message"));
 const user_1 = __importDefault(require("../Models/user"));
+const sequelize_1 = require("sequelize");
 const getUserList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userList = yield user_1.default.findAll();
@@ -39,12 +40,15 @@ const sendMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.sendMessage = sendMessage;
 const getMessages = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const lastMessageId = req.query.lastMessageId;
     try {
-        const messages = yield message_1.default.findAll({
+        const messages = yield message_1.default.findAll({ where: { id: { [sequelize_1.Op.gt]: lastMessageId } },
             include: [
-                { model: user_1.default, attributes: ['id', 'username'] }
-            ]
+                { model: user_1.default, attributes: ['username'] }
+            ],
+            limit: 10
         });
+        // console.log(messages);
         res.status(200).json({ messages: messages });
     }
     catch (err) {

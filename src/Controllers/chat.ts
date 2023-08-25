@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Message from '../Models/message';
 import User from '../Models/user';
+import { Model, Op } from 'sequelize';
+
 export const getUserList = async (req:Request,res:Response)=>{
    try{
     const userList =await User.findAll();
@@ -23,13 +25,16 @@ export const sendMessage = async (req:any,res:Response) =>{
     
 }
 export const getMessages =async (req:Request,res:Response)=>{
+    const lastMessageId = req.query.lastMessageId;
     try{
-        const messages = await Message.findAll({
+        const messages = await Message.findAll(
+            {where:{  id: {[Op.gt]: lastMessageId }},
             include: [
-                { model: User, attributes: ['id', 'username'] } 
+                { model: User, attributes: ['username'] }
             ]
-        });
-        
+            ,limit:10
+            });
+        // console.log(messages);
         res.status(200).json({messages:messages});
     }
     catch(err){console.log(err);}
