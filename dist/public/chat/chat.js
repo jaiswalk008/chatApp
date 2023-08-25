@@ -54,15 +54,23 @@ function showMessage(data) {
     newDiv.innerHTML = `<p class="${classname}">${data[1]}: ${data[0]}</p>`;
     chatContainer.appendChild(newDiv);
 }
-window.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const res = yield axios.get('http://localhost:4000/getMessages');
-        // console.log(res.data.messages);
-        res.data.messages.filter((element) => {
-            showMessage([element.content, element.user.username]);
+function start() {
+    setInterval(function getMessages() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const res = yield axios.get('http://localhost:4000/getMessages');
+                // console.log(res.data.messages);
+                chatContainer.innerHTML = '';
+                res.data.messages.filter((element) => {
+                    showMessage([element.content, element.user.username]);
+                });
+            }
+            catch (error) {
+                console.log(error);
+            }
         });
-    }
-    catch (error) {
-        console.log(error);
-    }
-}));
+    }, 1000);
+}
+window.addEventListener('DOMContentLoaded', () => {
+    start();
+});

@@ -47,16 +47,22 @@ function showMessage(data:Array<string>){
     chatContainer.appendChild(newDiv);
 
 }
-window.addEventListener('DOMContentLoaded',async () =>{
-    try {
-        const res = await axios.get('http://localhost:4000/getMessages');
-        // console.log(res.data.messages);
-        res.data.messages.filter((element: any) => {
-            showMessage([element.content, element.user.username]);
+function start(){
+    setInterval(async function getMessages(){
+        try {
+            const res = await axios.get('http://localhost:4000/getMessages');
+            // console.log(res.data.messages);
+            chatContainer.innerHTML='';
+            res.data.messages.filter((element: any) => {
+                showMessage([element.content, element.user.username]);
+                
+            });        
             
-        });        
-        
-    } catch (error) {
-        console.log(error);
-    }
+        } catch (error) {
+            console.log(error);
+        }
+    },1000);
+}
+window.addEventListener('DOMContentLoaded', () =>{
+    start();
 })
