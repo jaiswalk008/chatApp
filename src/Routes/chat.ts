@@ -7,4 +7,5 @@ router.get('/getUsers',messageController.getUserList);
 
 router.post('/sendMessage',authenticate,messageController.sendMessage);
 
+router.get('/getMessages',messageController.getMessages);
 export default router;

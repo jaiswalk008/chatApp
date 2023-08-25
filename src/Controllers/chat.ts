@@ -22,3 +22,15 @@ export const sendMessage = async (req:any,res:Response) =>{
     }
     
 }
+export const getMessages =async (req:Request,res:Response)=>{
+    try{
+        const messages = await Message.findAll({
+            include: [
+                { model: User, attributes: ['id', 'username'] } 
+            ]
+        });
+        
+        res.status(200).json({messages:messages});
+    }
+    catch(err){console.log(err);}
+}

@@ -32,4 +32,5 @@ const auth_1 = __importDefault(require("../middlewares/auth"));
 const router = (0, express_1.Router)();
 router.get('/getUsers', messageController.getUserList);
 router.post('/sendMessage', auth_1.default, messageController.sendMessage);
+router.get('/getMessages', messageController.getMessages);
 exports.default = router;

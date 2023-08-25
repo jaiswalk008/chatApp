@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 const token = localStorage.getItem('token');
 const username = localStorage.getItem('username');
+const chatContainer = document.querySelector('.chat');
 const messageForm = document.querySelector('.send-message');
 function showUsersList() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -44,5 +45,13 @@ function sendMessage(e) {
     });
 }
 function showMessage(text) {
-    console.log(text);
 }
+window.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const res = yield axios.get('http://localhost:4000/getMessages');
+        console.log(res.data.messages);
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));

@@ -4,7 +4,7 @@
 declare var axios:any;
 const token:string = localStorage.getItem('token');
 const username:string = localStorage.getItem('username');
-
+const chatContainer = document.querySelector('.chat') as HTMLElement;
 const messageForm = document.querySelector('.send-message') as HTMLFormElement;
 async function showUsersList(){
     try {
@@ -37,5 +37,13 @@ async function sendMessage(e:Event){
 
 }
 function showMessage(text:string){
-    console.log(text);
+    
 }
+window.addEventListener('DOMContentLoaded',async () =>{
+    try {
+        const res = await axios.get('http://localhost:4000/getMessages');
+        console.log(res.data.messages);
+    } catch (error) {
+        console.log(error);
+    }
+})

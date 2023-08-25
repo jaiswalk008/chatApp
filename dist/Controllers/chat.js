@@ -12,7 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendMessage = exports.getUserList = void 0;
+exports.getMessages = exports.sendMessage = exports.getUserList = void 0;
+const message_1 = __importDefault(require("../Models/message"));
 const user_1 = __importDefault(require("../Models/user"));
 const getUserList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -37,3 +38,17 @@ const sendMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.sendMessage = sendMessage;
+const getMessages = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const messages = yield message_1.default.findAll({
+            include: [
+                { model: user_1.default, attributes: ['id', 'username'] } // Include user and select specific attributes
+            ]
+        });
+        res.status(200).json({ messages: messages });
+    }
+    catch (err) {
+        console.log(err);
+    }
+});
+exports.getMessages = getMessages;
