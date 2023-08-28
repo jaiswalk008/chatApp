@@ -17,7 +17,7 @@ export const sendMessage = async (req:any,res:Response) =>{
     console.log(text);
     try {
         
-        const result =await req.user.createMessage({content:text}); 
+        const result =await req.user.createMessage({content:text, groupId:req.body.groupId}); 
         res.status(200).json({message:text});
     } catch (error) {
         console.log(error);
@@ -28,7 +28,7 @@ export const getMessages =async (req:Request,res:Response)=>{
     const lastMessageId = req.query.lastMessageId;
     try{
         const messages = await Message.findAll(
-            {where:{  id: {[Op.gt]: lastMessageId }},
+            {where:{ groupId:req.query.groupId, id: {[Op.gt]: lastMessageId }},
             include: [
                 { model: User, attributes: ['username'] }
             ]

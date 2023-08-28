@@ -18,13 +18,16 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const database_1 = __importDefault(require("./util.js/database"));
+//import Routes
 const user_1 = __importDefault(require("./Routes/user"));
 const chat_1 = __importDefault(require("./Routes/chat"));
+const group_1 = __importDefault(require("./Routes/group"));
+//importing Models
 const user_2 = __importDefault(require("./Models/user"));
 const message_1 = __importDefault(require("./Models/message"));
 // import Chat from './Models/chat';
-// import Group from './Models/group';
-// import UserGroup from './Models/userGroup';
+const group_2 = __importDefault(require("./Models/group"));
+const userGroup_1 = __importDefault(require("./Models/userGroup"));
 const server = (0, express_1.default)();
 server.use((0, cors_1.default)({
     origin: "http://127.0.0.1:5500",
@@ -35,12 +38,15 @@ server.use(body_parser_1.default.json());
 // Chat.hasOne(Message)
 user_2.default.hasMany(message_1.default);
 message_1.default.belongsTo(user_2.default);
+group_2.default.belongsToMany(user_2.default, { through: userGroup_1.default });
+user_2.default.belongsToMany(group_2.default, { through: userGroup_1.default });
 // In the User model
 // User.belongsToMany(Group, { through: UserGroup, as: 'groups', foreignKey: 'userId' });
 // // In the Group model
 // Group.belongsToMany(User, { through: UserGroup, as: 'members', foreignKey: 'groupId' });
 server.use(user_1.default);
 server.use(chat_1.default);
+server.use(group_1.default);
 // server.use((req,res) =>{
 //     res.sendFile(path.join(__dirname,`public${req.url}`));
 // });

@@ -6,14 +6,17 @@ dotenv.config();
 import sequelize from './util.js/database';
 
 import path from 'path';
+//import Routes
 import userRoutes from './Routes/user';
 import chatRoutes from './Routes/chat';
+import groupRoutes from './Routes/group';
 
+//importing Models
 import User from './Models/user';
 import Message from './Models/message';
 // import Chat from './Models/chat';
-// import Group from './Models/group';
-// import UserGroup from './Models/userGroup';
+import Group from './Models/group';
+import UserGroup from './Models/userGroup';
 const server = express();
 server.use(cors({
     origin:"http://127.0.0.1:5500",
@@ -27,6 +30,8 @@ server.use(bodyParser.json());
 User.hasMany(Message);
 
 Message.belongsTo(User);
+Group.belongsToMany(User, { through: UserGroup });
+User.belongsToMany(Group, { through: UserGroup });
 // In the User model
 // User.belongsToMany(Group, { through: UserGroup, as: 'groups', foreignKey: 'userId' });
 
@@ -35,6 +40,7 @@ Message.belongsTo(User);
 
 server.use(userRoutes);
 server.use(chatRoutes);
+server.use(groupRoutes);
 // server.use((req,res) =>{
 //     res.sendFile(path.join(__dirname,`public${req.url}`));
 // });

@@ -31,7 +31,7 @@ const sendMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     console.log(req.body);
     console.log(text);
     try {
-        const result = yield req.user.createMessage({ content: text });
+        const result = yield req.user.createMessage({ content: text, groupId: req.body.groupId });
         res.status(200).json({ message: text });
     }
     catch (error) {
@@ -42,7 +42,7 @@ exports.sendMessage = sendMessage;
 const getMessages = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const lastMessageId = req.query.lastMessageId;
     try {
-        const messages = yield message_1.default.findAll({ where: { id: { [sequelize_1.Op.gt]: lastMessageId } },
+        const messages = yield message_1.default.findAll({ where: { groupId: req.query.groupId, id: { [sequelize_1.Op.gt]: lastMessageId } },
             include: [
                 { model: user_1.default, attributes: ['username'] }
             ],

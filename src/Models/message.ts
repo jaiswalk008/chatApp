@@ -9,15 +9,15 @@ const Message = sequelize.define('message',{
         autoIncrement:true
     },
     content:{
-        type:TEXT,
+        type:Sequelize.TEXT,
         allowNull:false
 
     },
-    recieverId:{
+    groupId:{
         type:Sequelize.INTEGER,
-        defaultValue:1,
         allowNull:false
     }
+
 
 })
 export default Message;

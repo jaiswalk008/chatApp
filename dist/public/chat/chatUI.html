@@ -17,32 +17,36 @@
     </navbar>
     <div class="container-fluid h-75 d-flex justify-content-start ">
         
-        <div class="container user-list w-25 d-flex justify-content-start flex-column" >    
+        <div class="container group-list w-25 d-flex justify-content-start flex-column" >    
             <div class="d-flex ">
                 <input type="text" class="form-control form-control-lg mb-1 " onchange="searchUser()" id="search-user" name="search-user" placeholder="search">
                 <div >
-                    <button type="button" class="btn m-1 btn-primary " onclick="showUsersList()" data-bs-toggle="modal" data-bs-target="#new-chat">
+                    <button type="button" class="btn m-1 btn-primary " onclick="createGroup()" data-bs-toggle="modal" data-bs-target="#new-chat">
                         New</i>
                       </button>
                     <div class="modal fade " id="new-chat" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog ">
                             <div class="modal-content bg-dark">
-                              <div class="modal-header bg-danger d-flex">
-                                <h5 class="modal-title" id="exampleModalLabel">Users:</h5>
-                                <button class="btn btn-dark" onclick="addNewGroup()">new group</button>
-                              </div>
-                                <div class="active-user-list">
-                                    <li>karan</li>
-                                    <li>shivam</li>
-                                    <li>keshaw</li>
-                                    <li>revi</li>
+                              <div class="modal-header bg-danger d-flex flex-column">
+                                <div class="d-flex justify-content-start">
+                                    <label for="groupname" class="form-label m-1">Group Name:</label>
+                                    <input type="text"  name="groupname" id="groupname" required>
                                 </div>
+                                <p class="alert text-dark">Group Name cannot be empty!!</p>
+                              </div>
+                              <div class="text-start  p-3">
+                                <span>Select the users to add to the group</span>
+                                <hr>
+                                <ul class="list-unstyled user-list">
+                                </ul>
+
+                              </div>
                                   <div class="modal-footer">
-                                    <button type="button" id="close" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                    <button class="btn btn-danger" type="submit" onclick="addNewGroup()">create</button>
+                                    <button type="button" id="close" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                    
                                   </div>
-                              </form>
-                              
+                               
                             </div>
                         </div>
                     </div>
@@ -50,14 +54,14 @@
             </div>
             <div class="d-flex class-list flex-column">
                 <header class="text-white fw-bold fs-5">Chats</header>
-                <button  class="btn active">New Group 1</button>
+                <!-- <button  class="btn active">New Group 1</button> -->
 
             <!-- <i class="bi bi-send-fill"></i> -->
             </div>
         </div>
         <div class="container conversation w-75">
-            <div class="container-fluid  text-light chat-name"><i class="bi bi-people-fill"></i>New Group 1</div>
-                <div  class="h-75 container chat d-flex justify-content-start  flex-column ">
+            <div class="container-fluid  text-light chat-name"><i class="bi bi-people-fill"></i></div>
+                <div  class="h-75 container chat d-flex justify-content-start flex-column ">
                 <!-- <div class="d-flex align-items-center flex-column"><p class="joined">karan joined</p></div> -->
                 <!-- <div><p class="my-message">you: I am good</p></div> -->
                 <!-- <div class="d-flex align-items-center flex-column"><p class="joined">Shivam joined</p></div> -->
@@ -75,7 +79,8 @@
         </div>
         
     </div>
-    <script src="chat.js"></script>
+    <!-- <script src="chat.js"></script> -->
+    <script src="newgroup.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 </body>

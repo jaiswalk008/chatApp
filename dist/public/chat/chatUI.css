@@ -3,7 +3,7 @@
 html,body{
     height: 100%;
 }
-.active-user-list{
+.active-group-list{
     text-align: left;
     margin: 10px;
 }
@@ -15,7 +15,7 @@ html,body{
     text-align: center; 
     text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3); /* Adding text shadow */
 } 
-.user-list{
+.group-list{
     text-align: center;
     text-transform: capitalize ;
 }
@@ -23,7 +23,7 @@ html,body{
     background-color: #20232B;
     color: #ffffff;
 }
-.user-list >div> .btn{
+.group-list >div> .btn{
     margin: 5px 0;
     color: bisque;
 }
@@ -31,7 +31,7 @@ html,body{
     color: rgb(24, 24, 24);
     background-color: #ffffff;
 }
-.user-list >div> .btn:hover{
+.group-list >div> .btn:hover{
     background-color: #20232B;
     color: #ffffff;
 }
@@ -54,6 +54,12 @@ html,body{
     width: fit-content; 
     float: right !important;
     margin: 5px 0;
+}
+.alert{
+    background-color: red;
+    padding: 2px;
+    margin-top: 10px;
+    display: none;
 }
 .modal-header >button:hover{
     background-color: #606060;

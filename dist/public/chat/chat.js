@@ -12,24 +12,15 @@ const token = localStorage.getItem('token');
 const username = localStorage.getItem('username');
 const chatContainer = document.querySelector('.chat');
 const messageForm = document.querySelector('.send-message');
-function showUsersList() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const res = yield axios.get('http://localhost:4000/getUsers');
-            console.log(res.data.userList);
-        }
-        catch (error) {
-            console.log(error);
-        }
-    });
-}
+const groupBtn = document.querySelector('.active');
 messageForm.addEventListener('submit', sendMessage);
 function sendMessage(e) {
     return __awaiter(this, void 0, void 0, function* () {
         e.preventDefault();
         const formElement = e.target;
         const chatMessage = {
-            message: formElement.message.value
+            message: formElement.message.value,
+            groupId: groupBtn.id
         };
         console.log(chatMessage);
         try {
@@ -67,7 +58,7 @@ function start() {
     setInterval(function getMessages() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const res = yield axios.get(`http://localhost:4000/getMessages?lastMessageId=${lastMessageId}`);
+                const res = yield axios.get(`http://localhost:4000/getMessages?lastMessageId=${lastMessageId}&groupId=${groupBtn.id}`);
                 // console.log(res.data.messages);
                 // lastMessageId = res.data.messages.At(-1).id;
                 res.data.messages.filter((element) => {
