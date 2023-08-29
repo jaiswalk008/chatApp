@@ -26,9 +26,11 @@ export const sendMessage = async (req:any,res:Response) =>{
 }
 export const getMessages =async (req:Request,res:Response)=>{
     const lastMessageId = req.query.lastMessageId;
+    const groupId= req.query.groupId;
+    console.log('groupid = '+groupId);
     try{
         const messages = await Message.findAll(
-            {where:{ groupId:req.query.groupId, id: {[Op.gt]: lastMessageId }},
+            {where:{ groupId:groupId, id: {[Op.gt]: lastMessageId }},
             include: [
                 { model: User, attributes: ['username'] }
             ]
