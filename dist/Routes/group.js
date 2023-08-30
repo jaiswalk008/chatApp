@@ -32,4 +32,7 @@ const router = (0, express_1.Router)();
 const auth_1 = __importDefault(require("../middlewares/auth"));
 router.post('/createGroup', auth_1.default, groupController.addGroup);
 router.get('/getGroups', auth_1.default, groupController.getGroups);
+router.get('/getMembers', groupController.getMembers);
+router.delete('/removeuser', groupController.removeUser);
+router.get('/makeAdmin', groupController.makeAdmin);
 exports.default = router;

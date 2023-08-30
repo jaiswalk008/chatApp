@@ -17,6 +17,10 @@ const UserGroup = sequelize.define('user_group', {
         type: Sequelize.INTEGER,
         allowNull: false,
     },
+    admin:{
+        type:Sequelize.BOOLEAN,
+        defaultValue:false,
+    }
 });
 
 export default UserGroup;

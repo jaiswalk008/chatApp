@@ -7,6 +7,7 @@ const messageForm = document.querySelector('.send-message') as HTMLFormElement;
 const userList = document.querySelector('.user-list') as HTMLUListElement;
 const chatList= document.querySelector('.class-list') as HTMLDivElement;
 const error = document.querySelector('.alert') as HTMLParagraphElement;
+const groupInfo = document.querySelector('.group-info') as HTMLDivElement;
 // const groupBtn= document.querySelector('.active') as HTMLButtonElement;
 messageForm.addEventListener('submit',sendMessage);
 
@@ -58,9 +59,9 @@ let intervalId:any = null;
 function start(groupId:string){
     // console.log(groupId);
     let lastMessageId= -1; 
-    localStorage.setItem('groupId',groupId);
+    
     const messageArray:Array<[string,string,string]>=[];
-    //clearing interval id 
+    //clearing interval id so that the function is not getting called with older ids
     if (intervalId) {
         clearInterval(intervalId);
     }
@@ -84,30 +85,27 @@ function start(groupId:string){
         } catch (error) {
             console.log(error);
         }
-    },1000);
+    },10000000000);
 }
+
 window.addEventListener('DOMContentLoaded',async () =>{
     try{
         const res = await axios.get('http://localhost:4000/getGroups',{headers:{Authorization:token}});
-        
-        
+
         res.data.groupIds.filter((element:any,index:number)=>{
             displayGroup(element.groupId,res.data.groupNames[index]);
         })
        
         const element = chatList.firstElementChild.nextSibling as HTMLButtonElement;
+        changeActiveBtn(element.id);
         if(element) element.className="btn active";
-        const activeGroup = document.querySelector('.active') as HTMLButtonElement;
-        if(activeGroup){
-           
-            const groupId = activeGroup.id;
-            start(groupId); 
-            localStorage.setItem('groupId',groupId);
-        }
+        
+        start(element.id);
     }
     catch(err) {console.log(err);}
     
 }) 
+//function for creating groups
 async function createGroup(){
     try {
         const res = await axios.get('http://localhost:4000/getUsers');
@@ -119,6 +117,7 @@ async function createGroup(){
         console.log(error);
     }
 }
+//function for showing user list when creating a group
 function showUserList(userData:[number,string]){
     
     const newLi = document.createElement('li');
@@ -126,6 +125,7 @@ function showUserList(userData:[number,string]){
     <label for="${userData[0]}" class="form-label"> ${userData[1]}</label><br>`
     userList.appendChild(newLi);
 }
+//function for creating the group
 async function addNewGroup(e:Event){
     
     const groupNameInput  = document.getElementById('groupname') as HTMLInputElement;
@@ -164,6 +164,8 @@ async function addNewGroup(e:Event){
     
 }
 
+//function for displaying groupname in the chat list
+//Note: The groups which the user is a part of will be visible to the user
 function displayGroup(id:string, groupName:string){
     const grpBtn = document.createElement('button');
     
@@ -174,21 +176,92 @@ function displayGroup(id:string, groupName:string){
     error.style.display = 'none';
 
     const chatName = document.querySelector('.chat-name') as HTMLDivElement;
-    chatName.innerHTML =`<i class="bi bi-people-fill"> </i><span>${groupName}</span>`;
+    chatName.innerHTML =`<i class="bi bi-people-fill"> </i><span id="${grpBtn.id}">${groupName}</span>`;
     
     chatList.insertBefore(grpBtn,chatList.firstElementChild.nextSibling);
 }
+//function for switching chats
 function changeGroup(id:string,groupName:string){
-    changeActiveBtn();
+    changeActiveBtn(id);
+    groupInfo.style.display='none';
     // console.log(id);
     const btn = document.getElementById(id) as HTMLButtonElement;
     btn.className='btn active';
     const chatName = document.querySelector('.chat-name') as HTMLDivElement;
-    chatName.innerHTML =`<i class="bi bi-people-fill"> </i><span>${groupName}</span>`;
+    chatName.innerHTML =`<i class="bi bi-people-fill"> </i><span id="${id}">${groupName}</span>`;
     start(id);
     localStorage.removeItem('messageArray');
 } 
-function changeActiveBtn(){
+
+function changeActiveBtn(groupId:string){
     const currActiveBtn  = document.querySelector('.active') as HTMLButtonElement;
     if(currActiveBtn) currActiveBtn.className='btn';
+    localStorage.setItem('groupId',groupId);
+}
+
+
+const chatHead = document.querySelector('.chat-name') as HTMLDivElement;
+
+chatHead.addEventListener('click',async()=>{
+    
+   
+    groupInfo.style.display='block';
+    const groupSpan = chatHead.firstElementChild.nextElementSibling;
+    const groupId= groupSpan.id;
+    const groupName = groupSpan.innerHTML;
+    const memberListContainer = document.querySelector('.member-list') as HTMLDivElement;
+    memberListContainer.innerHTML='';
+    // console.log(groupName);
+    const getMembers = await axios.get('http://localhost:4000/getMembers?groupId='+groupId);
+    const groupNameDisplay = document.querySelector('.groupname') as HTMLParagraphElement;
+    groupNameDisplay.innerText=groupName;
+    console.log(getMembers.data.userIds);
+    let ind = getMembers.data.userNames.indexOf(username);
+    let flag =false;
+    if(getMembers.data.userIds[ind].admin) flag=true;
+    getMembers.data.userIds.filter((userInfo:{userId:string,admin:boolean},index:number)=>{
+        let text='';
+        const memberInfo = document.createElement('h5');
+        text= userInfo.admin? "admin": "Make admin";
+        let display='';
+        if(index==ind) display='d-none';
+        if(flag){
+            memberInfo.innerHTML=
+            `${getMembers.data.userNames[index]} <i onClick="removeUser(this,${userInfo.userId},${groupId})" class="bi bi-x fs-3 text-danger ${display}"></i> <button class="btn btn-danger" id="admin${userInfo.userId}" onClick="makeAdmin(${userInfo.userId},${groupId})">${text}</button>`
+        }
+        else{
+            if(text=="admin") memberInfo.innerHTML=
+            `${getMembers.data.userNames[index]} <button class="btn btn-danger" >${text}</button>`
+            else {
+                memberInfo.innerHTML=`${getMembers.data.userNames[index]}`
+            }
+        }
+       
+        memberListContainer.appendChild(memberInfo);
+    })
+  
+}) 
+async function removeUser(clickedElement:any,userId:string,groupId:string){
+    console.log(groupId);
+    try {
+        const res = await axios.delete(`http://localhost:4000/removeuser?userId=${userId}&groupId=${groupId}`);
+        
+        var h5Element = clickedElement.closest("h5");
+        if (h5Element) {
+            // Remove the <h5> element from its parent
+            h5Element.parentNode.removeChild(h5Element);
+        }
+        alert(res.data.message); 
+    } catch (error) {
+        console.log(error);
+    }
+}
+async function makeAdmin(userId:string,groupId:string){
+    try {
+        const res = await axios.get(`http://localhost:4000/makeAdmin?userId=${userId}&groupId=${groupId}`);
+        const adminBtn= document.getElementById('admin'+userId) as HTMLButtonElement;
+        adminBtn.innerText='admin';
+    } catch (error) {
+        console.log(error);
+    }
 }

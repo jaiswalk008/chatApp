@@ -104,12 +104,29 @@ html,body{
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
 }
+.chat-name:hover{
+    cursor: pointer;
+}
+.group-info{
+    width: 350px;
+    background-color: #20232B;
+    border: 2px solid black;
+    border-radius: 10px;
+    margin-left: 2px;
+    height: 100%;
+    display: none; 
+}
 .bi-people-fill{
     
     padding:0px 5px;
     margin: 10px;
-    color: #20232B;
+    color: beige;
     font-size: 1.5rem;
+}
+.bi-x:hover{
+    cursor: pointer;
+    background-color:  #2d2f30;
+  
 }
 .chat{
     overflow-y: auto;

@@ -12,7 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getGroups = exports.addGroup = void 0;
+exports.makeAdmin = exports.removeUser = exports.getMembers = exports.getGroups = exports.addGroup = void 0;
+const user_1 = __importDefault(require("../Models/user"));
 const group_1 = __importDefault(require("../Models/group"));
 const userGroup_1 = __importDefault(require("../Models/userGroup"));
 const addGroup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -26,9 +27,13 @@ const addGroup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
         // Create associations between users and the group
         for (const userId of groupDetails.userIds) {
+            let admin = false;
+            if (userId == req.user.id)
+                admin = true;
             const userGroup = yield userGroup_1.default.create({
                 userId,
-                groupId: group.id
+                groupId: group.id,
+                admin: admin
             });
             console.log(userGroup);
         }
@@ -59,3 +64,52 @@ const getGroups = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getGroups = getGroups;
+const getMembers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const groupId = req.query.groupId;
+    try {
+        const userIds = yield userGroup_1.default.findAll({ where: { groupId: groupId },
+            attributes: ['userId', 'admin'],
+        });
+        const userNamePromises = userIds.map((userData) => __awaiter(void 0, void 0, void 0, function* () {
+            const user = yield user_1.default.findByPk(userData.userId);
+            return user.username;
+        }));
+        const userNames = yield Promise.all(userNamePromises);
+        // console.log(userNames);
+        res.status(201).json({ userIds: userIds, userNames: userNames });
+    }
+    catch (err) {
+        console.log(err);
+    }
+});
+exports.getMembers = getMembers;
+const removeUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const groupId = req.query.groupId;
+    const userId = req.query.userId;
+    console.log(userId, groupId);
+    try {
+        const userGroup = yield userGroup_1.default.findAll({ where: { userId: userId, groupId: groupId } });
+        console.log(userGroup);
+        yield userGroup[0].destroy();
+        res.status(201).json({ message: "user removed" });
+    }
+    catch (error) {
+        console.log(error);
+    }
+});
+exports.removeUser = removeUser;
+const makeAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const groupId = req.query.groupId;
+    const userId = req.query.userId;
+    console.log(groupId, userId);
+    console.log(userId, groupId);
+    try {
+        const result = yield userGroup_1.default.update({ admin: true }, { where: { userId: userId, groupId: groupId } });
+        console.log(result);
+        res.status(201).json(result);
+    }
+    catch (error) {
+        console.log(error);
+    }
+});
+exports.makeAdmin = makeAdmin;

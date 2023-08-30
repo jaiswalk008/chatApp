@@ -20,5 +20,9 @@ const UserGroup = database_1.default.define('user_group', {
         type: sequelize_1.default.INTEGER,
         allowNull: false,
     },
+    admin: {
+        type: sequelize_1.default.BOOLEAN,
+        defaultValue: false,
+    }
 });
 exports.default = UserGroup;
