@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMessages = exports.sendMessage = exports.getUserList = void 0;
 const message_1 = __importDefault(require("../Models/message"));
 const user_1 = __importDefault(require("../Models/user"));
-const sequelize_1 = require("sequelize");
 const getUserList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userList = yield user_1.default.findAll();
@@ -28,8 +27,6 @@ const getUserList = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.getUserList = getUserList;
 const sendMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const text = req.body.message;
-    console.log(req.body);
-    console.log(text);
     try {
         const result = yield req.user.createMessage({ content: text, groupId: req.body.groupId });
         res.status(200).json({ message: text });
@@ -40,17 +37,16 @@ const sendMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.sendMessage = sendMessage;
 const getMessages = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const lastMessageId = req.query.lastMessageId;
     const groupId = req.query.groupId;
-    console.log('groupid = ' + groupId);
     try {
-        const messages = yield message_1.default.findAll({ where: { groupId: groupId, id: { [sequelize_1.Op.gt]: lastMessageId } },
+        const messages = yield message_1.default.findAll({ where: { groupId: groupId },
             include: [
                 { model: user_1.default, attributes: ['username'] }
             ],
-            limit: 10
+            order: [['createdAt', 'DESC']],
+            limit: 20
         });
-        // console.log(messages);
+        // console.log(messages); 
         res.status(200).json({ messages: messages });
     }
     catch (err) {

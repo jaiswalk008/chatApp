@@ -21,10 +21,10 @@ async function signup(e: Event){
         password:formElement.password.value
     }
     try{
-        const res=await axios.post('http://13.235.45.170:4000/'+'signup',userDetails);
+        const res=await axios.post('http://localhost:4000/'+'signup',userDetails);
         console.log(res.data.userDetails);
         signupForm.reset();
-        window.location.replace('user/login.html')
+        window.location.replace('login.html')
     }
     catch(err:any){
         console.log(err);

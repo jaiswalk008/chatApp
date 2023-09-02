@@ -18,7 +18,12 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const database_1 = __importDefault(require("./util.js/database"));
+const http_1 = __importDefault(require("http"));
+const socket_io_1 = require("socket.io");
 const path_1 = __importDefault(require("path"));
+const server = (0, express_1.default)();
+const app = http_1.default.createServer(server);
+const io = new socket_io_1.Server(app);
 //import Routes
 const user_1 = __importDefault(require("./Routes/user"));
 const chat_1 = __importDefault(require("./Routes/chat"));
@@ -29,7 +34,6 @@ const message_1 = __importDefault(require("./Models/message"));
 // import Chat from './Models/chat';
 const group_2 = __importDefault(require("./Models/group"));
 const userGroup_1 = __importDefault(require("./Models/userGroup"));
-const server = (0, express_1.default)();
 server.use((0, cors_1.default)({
 // origin:"http://127.0.0.1:5500",
 // methods:["GET","POST","DELETE"]
@@ -46,11 +50,28 @@ server.use((req, res) => {
     console.log(req.url);
     res.sendFile(path_1.default.join(__dirname, `public${req.url}`));
 });
+//socket.io
+io.on('connection', (socket) => {
+    console.log(socket.id);
+    socket.on('send-message', (chatMessage) => {
+        // socket.join(chatMessage.groupId);
+        socket.to(chatMessage.groupId).emit("received-message", chatMessage);
+        console.log(chatMessage);
+    });
+    socket.on('join-room', (room) => {
+        console.log(`User ${socket.id} joined room: ${room}`);
+        socket.join(room);
+    });
+    socket.on('leave-room', (room) => {
+        socket.leave(room);
+        console.log(`User ${socket.id} left room: ${room}`);
+    });
+});
 function startServer() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield database_1.default.sync({ force: false });
-            server.listen(process.env.PORT || 4000);
+            app.listen(process.env.PORT || 4000);
         }
         catch (err) {
             console.log(err);

@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 const signupForm = document.querySelector('.form');
 signupForm.addEventListener('submit', signup);
-const url1 = 'http://localhost:4000/';
 function signup(e) {
     return __awaiter(this, void 0, void 0, function* () {
         e.preventDefault();
@@ -22,10 +21,10 @@ function signup(e) {
             password: formElement.password.value
         };
         try {
-            const res = yield axios.post(url1 + 'signup', userDetails);
+            const res = yield axios.post('http://localhost:4000/' + 'signup', userDetails);
             console.log(res.data.userDetails);
             signupForm.reset();
-            window.location.replace('user/login.html');
+            window.location.replace('login.html');
         }
         catch (err) {
             console.log(err);

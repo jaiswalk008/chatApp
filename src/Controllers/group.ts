@@ -6,7 +6,7 @@ import { Model } from "sequelize";
 export const addGroup = async (req: any, res: Response) => {
     const groupDetails: { groupName: string, userIds: number[] } = { ...req.body };
     groupDetails.userIds.push(req.user.id);
-    console.log(groupDetails);
+    // console.log(groupDetails);
     try {
         // Create the group
         const group:any = await Group.create({
@@ -22,7 +22,7 @@ export const addGroup = async (req: any, res: Response) => {
                 groupId: group.id,
                 admin:admin
             });
-            console.log(userGroup);
+            // console.log(userGroup);
         }
         
         res.status(201).json({ message: 'Group created successfully' , groupId:group.id , groupName:groupDetails.groupName});
@@ -73,7 +73,7 @@ export const getMembers = async (req:any , res:Response) =>{
 export const removeUser = async (req:any,res:Response) =>{
     const groupId:string= req.query.groupId;
     const userId:string = req.query.userId;
-    console.log(userId,groupId);
+    // console.log(userId,groupId);
     try {
         const userGroup:any = await UserGroup.findAll({where:{userId:userId,groupId:groupId}});
         console.log(userGroup);
@@ -86,16 +86,13 @@ export const removeUser = async (req:any,res:Response) =>{
 export const makeAdmin = async(req:any,res:Response)=>{
     const groupId:string= req.query.groupId;
     const userId:string = req.query.userId;
-    console.log(groupId,userId);
-    console.log(userId,groupId);
+  
     try {
         const result= await UserGroup.update(
             { admin: true },
             { where: { userId: userId, groupId: groupId } }
         );
 
-            console.log(result);
-        
         res.status(201).json(result);
     } catch (error) {
         console.log(error);

@@ -3,7 +3,7 @@ const loginForm = document.querySelector('.form') as HTMLFormElement;
 
 loginForm.addEventListener('submit',login);
 declare var axios:any;
-const url2='http://13.235.45.170:4000/';
+const url2='http://localhost:4000/';
 
 async function login(e:Event){
     e.preventDefault();

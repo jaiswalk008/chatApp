@@ -19,7 +19,7 @@ const userGroup_1 = __importDefault(require("../Models/userGroup"));
 const addGroup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const groupDetails = Object.assign({}, req.body);
     groupDetails.userIds.push(req.user.id);
-    console.log(groupDetails);
+    // console.log(groupDetails);
     try {
         // Create the group
         const group = yield group_1.default.create({
@@ -35,7 +35,7 @@ const addGroup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 groupId: group.id,
                 admin: admin
             });
-            console.log(userGroup);
+            // console.log(userGroup);
         }
         res.status(201).json({ message: 'Group created successfully', groupId: group.id, groupName: groupDetails.groupName });
     }
@@ -86,7 +86,7 @@ exports.getMembers = getMembers;
 const removeUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const groupId = req.query.groupId;
     const userId = req.query.userId;
-    console.log(userId, groupId);
+    // console.log(userId,groupId);
     try {
         const userGroup = yield userGroup_1.default.findAll({ where: { userId: userId, groupId: groupId } });
         console.log(userGroup);
@@ -101,11 +101,8 @@ exports.removeUser = removeUser;
 const makeAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const groupId = req.query.groupId;
     const userId = req.query.userId;
-    console.log(groupId, userId);
-    console.log(userId, groupId);
     try {
         const result = yield userGroup_1.default.update({ admin: true }, { where: { userId: userId, groupId: groupId } });
-        console.log(result);
         res.status(201).json(result);
     }
     catch (error) {

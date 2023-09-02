@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+const socket = io('http://localhost:4000/');
 const token = localStorage.getItem('token');
 const username = localStorage.getItem('username');
 const chatContainer = document.querySelector('.chat');
@@ -18,6 +19,13 @@ const error = document.querySelector('.alert');
 const groupInfo = document.querySelector('.group-info');
 // const groupBtn= document.querySelector('.active') as HTMLButtonElement;
 messageForm.addEventListener('submit', sendMessage);
+socket.on('connect', () => {
+    console.log(socket.id);
+});
+socket.on('received-message', (messageData) => {
+    console.log(messageData);
+    showMessage(messageData);
+});
 //function for sending message
 function sendMessage(e) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -26,14 +34,16 @@ function sendMessage(e) {
         const formElement = e.target;
         const chatMessage = {
             message: formElement.message.value,
-            groupId: groupBtn.id
+            groupId: groupBtn.id,
+            username: username
         };
         // console.log(chatMessage);
         try {
             const res = yield axios.post('http://localhost:4000/sendMessage', chatMessage, {
                 headers: { Authorization: token }
             });
-            // showMessage([res.data.message , username]);
+            socket.emit('send-message', chatMessage);
+            showMessage(chatMessage);
             messageForm.reset();
         }
         catch (error) {
@@ -42,55 +52,32 @@ function sendMessage(e) {
     });
 }
 //function for showing message on chat
-function showMessage() {
-    chatContainer.innerHTML = '';
-    const storedMessageArray = localStorage.getItem('messageArray');
-    if (storedMessageArray) {
-        const parsedMessageArray = JSON.parse(storedMessageArray);
-        parsedMessageArray.filter(element => {
-            const newDiv = document.createElement('div');
-            let classname = "message";
-            if (element[2] == username) {
-                classname = "my-message";
-                element[2] = "you";
-            }
-            newDiv.innerHTML = `<p class="${classname}">${element[2]}: ${element[1]}</p>`;
-            chatContainer.appendChild(newDiv);
-        });
+function showMessage(messageData) {
+    const newDiv = document.createElement('div');
+    let classname = "message";
+    if (messageData.username == username) {
+        classname = "my-message";
+        messageData.username = "you";
     }
+    newDiv.innerHTML = `<p class="${classname}">${messageData.username}: ${messageData.message}</p>`;
+    chatContainer.appendChild(newDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
 }
-let intervalId = null;
 //function for getting chat messages
-function start(groupId) {
-    // console.log(groupId);
-    let lastMessageId = -1;
-    const messageArray = [];
-    //clearing interval id so that the function is not getting called with older ids
-    if (intervalId) {
-        clearInterval(intervalId);
-    }
-    intervalId = setInterval(function getMessages() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                // console.log(groupId);
-                const res = yield axios.get(`http://localhost:4000/getMessages?lastMessageId=${lastMessageId}&groupId=${groupId}`);
-                // console.log(res.data.messages);
-                // lastMessageId = res.data.messages.At(-1).id;
-                res.data.messages.filter((element) => {
-                    // showMessage([element.content, element.user.username]);
-                    lastMessageId = element.id;
-                    messageArray.push([element.id, element.content, element.user.username]);
-                });
-                while (messageArray.length > 10)
-                    messageArray.shift();
-                localStorage.setItem('messageArray', JSON.stringify(messageArray));
-                showMessage();
-            }
-            catch (error) {
-                console.log(error);
-            }
-        });
-    }, 1000);
+function getMessages(groupId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // console.log(groupId);
+        try {
+            const res = yield axios.get(`http://localhost:4000/getMessages?groupId=${groupId}`);
+            console.log(res.data.messages);
+            res.data.messages.reverse().filter((element) => {
+                showMessage({ message: element.content, username: element.user.username });
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
+    });
 }
 window.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -100,9 +87,11 @@ window.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void
         });
         const element = chatList.firstElementChild.nextSibling;
         changeActiveBtn(element.id);
-        if (element)
+        if (element) {
             element.className = "btn active";
-        start(element.id);
+            socket.emit('join-room', element.id);
+        }
+        getMessages(element.id);
     }
     catch (err) {
         console.log(err);
@@ -142,7 +131,7 @@ function addNewGroup(e) {
         else {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
             const checkedValues = Array.from(checkboxes).map((checkbox) => parseInt(checkbox.id));
-            // console.log(checkedValues);
+            // console.log(checkedValues); 
             const closeBtn = document.getElementById('close');
             closeBtn.click();
             const data = {
@@ -157,12 +146,17 @@ function addNewGroup(e) {
                 });
                 // console.log(res.data);
                 const currActiveBtn = document.querySelector('.active');
-                if (currActiveBtn)
+                if (currActiveBtn) {
+                    console.log(currActiveBtn.id);
+                    socket.emit('leave-room', currActiveBtn.id);
                     currActiveBtn.className = 'btn';
+                }
                 displayGroup(res.data.groupId, res.data.groupName);
                 const element = chatList.firstElementChild.nextSibling;
                 element.className = "btn active";
                 groupNameInput.value = '';
+                getMessages(res.data.groupId);
+                socket.emit('join-room', res.data.groupId);
             }
             catch (err) {
                 console.log(err);
@@ -182,6 +176,9 @@ function displayGroup(id, groupName) {
     const chatName = document.querySelector('.chat-name');
     chatName.innerHTML = `<i class="bi bi-people-fill"> </i><span id="${grpBtn.id}">${groupName}</span>`;
     chatList.insertBefore(grpBtn, chatList.firstElementChild.nextSibling);
+    chatContainer.innerHTML = '';
+    socket.emit('join-room', grpBtn.id);
+    socket.emit('leave-room', grpBtn.id);
 }
 //function for switching chats
 function changeGroup(id, groupName) {
@@ -192,13 +189,17 @@ function changeGroup(id, groupName) {
     btn.className = 'btn active';
     const chatName = document.querySelector('.chat-name');
     chatName.innerHTML = `<i class="bi bi-people-fill"> </i><span id="${id}">${groupName}</span>`;
-    start(id);
-    localStorage.removeItem('messageArray');
+    getMessages(id);
+    chatContainer.innerHTML = '';
+    socket.emit('join-room', id);
 }
 function changeActiveBtn(groupId) {
     const currActiveBtn = document.querySelector('.active');
-    if (currActiveBtn)
+    if (currActiveBtn) {
+        socket.emit('leave-room', currActiveBtn.id);
+        console.log(currActiveBtn.id);
         currActiveBtn.className = 'btn';
+    }
     localStorage.setItem('groupId', groupId);
 }
 const chatHead = document.querySelector('.chat-name');
