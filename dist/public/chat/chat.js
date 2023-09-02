@@ -90,7 +90,7 @@ function start(groupId) {
                 console.log(error);
             }
         });
-    }, 10000000000);
+    }, 1000);
 }
 window.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
     try {

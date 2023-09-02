@@ -26,7 +26,7 @@ function login(e) {
             localStorage.setItem('username', res.data.username);
             localStorage.setItem('token', res.data.token);
             loginForm.reset();
-            window.location.replace('/dist/public/chat/chatUI.html');
+            window.location.replace('/chat/chatUI.html');
         }
         catch (err) {
             console.log(err);

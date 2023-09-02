@@ -25,7 +25,7 @@ function signup(e) {
             const res = yield axios.post(url1 + 'signup', userDetails);
             console.log(res.data.userDetails);
             signupForm.reset();
-            window.location.replace('/dist/public/user/login.html');
+            window.location.replace('user/login.html');
         }
         catch (err) {
             console.log(err);

@@ -24,7 +24,7 @@ async function sendMessage(e:Event){
     };
     // console.log(chatMessage);
     try {
-        const res = await axios.post('http://localhost:4000/sendMessage',chatMessage,{
+        const res = await axios.post('http://13.235.45.170:4000/sendMessage',chatMessage,{
             headers:{Authorization:token}
         });
         // showMessage([res.data.message , username]);
@@ -65,10 +65,10 @@ function start(groupId:string){
     if (intervalId) {
         clearInterval(intervalId);
     }
-    intervalId  = setInterval(async function getMessages(){
+    intervalId = setInterval(async function getMessages(){
         try {
             // console.log(groupId);
-            const res = await axios.get(`http://localhost:4000/getMessages?lastMessageId=${lastMessageId}&groupId=${groupId}`);
+            const res = await axios.get(`http://13.235.45.170:4000/getMessages?lastMessageId=${lastMessageId}&groupId=${groupId}`);
             // console.log(res.data.messages);
             // lastMessageId = res.data.messages.At(-1).id;
             
@@ -85,12 +85,12 @@ function start(groupId:string){
         } catch (error) {
             console.log(error);
         }
-    },10000000000);
+    },1000);
 }
 
 window.addEventListener('DOMContentLoaded',async () =>{
     try{
-        const res = await axios.get('http://localhost:4000/getGroups',{headers:{Authorization:token}});
+        const res = await axios.get('http://13.235.45.170:4000/getGroups',{headers:{Authorization:token}});
 
         res.data.groupIds.filter((element:any,index:number)=>{
             displayGroup(element.groupId,res.data.groupNames[index]);
@@ -108,7 +108,7 @@ window.addEventListener('DOMContentLoaded',async () =>{
 //function for creating groups
 async function createGroup(){
     try {
-        const res = await axios.get('http://localhost:4000/getUsers');
+        const res = await axios.get('http://13.235.45.170:4000/getUsers');
         userList.innerHTML='';
         res.data.userList.filter((element:any)=> {
             if(element.username!=username) showUserList([element.id, element.username])
@@ -148,7 +148,7 @@ async function addNewGroup(e:Event){
         // got the ids now and also do incliude the users id as well
         // send the userId along with the geoup name to backend
         try{
-            const res =await axios.post('http://localhost:4000/createGroup',data,{
+            const res =await axios.post('http://13.235.45.170:4000/createGroup',data,{
             headers:{Authorization:token}
             });
             // console.log(res.data);
@@ -212,7 +212,7 @@ chatHead.addEventListener('click',async()=>{
     const memberListContainer = document.querySelector('.member-list') as HTMLDivElement;
     memberListContainer.innerHTML='';
     // console.log(groupName);
-    const getMembers = await axios.get('http://localhost:4000/getMembers?groupId='+groupId);
+    const getMembers = await axios.get('http://13.235.45.170:4000/getMembers?groupId='+groupId);
     const groupNameDisplay = document.querySelector('.groupname') as HTMLParagraphElement;
     groupNameDisplay.innerText=groupName;
     console.log(getMembers.data.userIds);
@@ -244,7 +244,7 @@ chatHead.addEventListener('click',async()=>{
 async function removeUser(clickedElement:any,userId:string,groupId:string){
     console.log(groupId);
     try {
-        const res = await axios.delete(`http://localhost:4000/removeuser?userId=${userId}&groupId=${groupId}`);
+        const res = await axios.delete(`http://13.235.45.170:4000/removeuser?userId=${userId}&groupId=${groupId}`);
         
         var h5Element = clickedElement.closest("h5");
         if (h5Element) {
@@ -258,7 +258,7 @@ async function removeUser(clickedElement:any,userId:string,groupId:string){
 }
 async function makeAdmin(userId:string,groupId:string){
     try {
-        const res = await axios.get(`http://localhost:4000/makeAdmin?userId=${userId}&groupId=${groupId}`);
+        const res = await axios.get(`http://13.235.45.170:4000/makeAdmin?userId=${userId}&groupId=${groupId}`);
         const adminBtn= document.getElementById('admin'+userId) as HTMLButtonElement;
         adminBtn.innerText='admin';
     } catch (error) {
