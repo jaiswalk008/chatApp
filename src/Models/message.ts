@@ -16,6 +16,10 @@ const Message = sequelize.define('message',{
     groupId:{
         type:Sequelize.INTEGER,
         allowNull:false
+    },
+    type:{
+        type:Sequelize.STRING,
+        defaultValue:'text'
     }
 
 

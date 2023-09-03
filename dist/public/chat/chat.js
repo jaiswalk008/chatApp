@@ -19,11 +19,12 @@ const error = document.querySelector('.alert');
 const groupInfo = document.querySelector('.group-info');
 // const groupBtn= document.querySelector('.active') as HTMLButtonElement;
 messageForm.addEventListener('submit', sendMessage);
+const fileInput = document.getElementById('fileInput');
 socket.on('connect', () => {
     console.log(socket.id);
 });
 socket.on('received-message', (messageData) => {
-    console.log(messageData);
+    // console.log(messageData);
     showMessage(messageData);
 });
 //function for sending message
@@ -32,10 +33,14 @@ function sendMessage(e) {
         e.preventDefault();
         const groupBtn = document.querySelector('.active');
         const formElement = e.target;
+        const message = formElement.message.value;
+        if (message == "")
+            return;
         const chatMessage = {
             message: formElement.message.value,
             groupId: groupBtn.id,
-            username: username
+            username: username,
+            type: "text"
         };
         // console.log(chatMessage);
         try {
@@ -51,15 +56,72 @@ function sendMessage(e) {
         }
     });
 }
+function sendFile() {
+    console.log('clicked send buttm');
+    fileInput.click();
+}
+// const imageFileTypes = ['jpeg','jpg','png','gif'];
+// const videoFileTypes = ['mp4','mkv'];
+// Add an event listener to the file input element to handle file selection
+fileInput.addEventListener('change', function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log('input');
+        const selectedFiles = this.files;
+        const currActiveBtn = document.querySelector('.active');
+        // Loop through all selected files
+        for (let i = 0; i < selectedFiles.length; i++) {
+            const file = selectedFiles[i];
+            console.log(file);
+            try {
+                const formData = new FormData();
+                formData.append("file", file);
+                const response = yield axios.post(`http://localhost:4000/sendFile?groupId=${currActiveBtn.id}`, formData, {
+                    headers: {
+                        'Authorization': token,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                console.log('in ');
+                console.log(response.data.message);
+                const messageData = {
+                    message: response.data.message.content,
+                    groupId: currActiveBtn.id,
+                    username: username,
+                    type: response.data.message.type
+                };
+                console.log(messageData);
+                socket.emit('send-message', messageData);
+                showMessage(messageData);
+                // console.log('Upload successful!');
+            }
+            catch (error) {
+                console.error('Upload failed:', error);
+            }
+        }
+    });
+});
 //function for showing message on chat
 function showMessage(messageData) {
+    console.log(messageData);
     const newDiv = document.createElement('div');
     let classname = "message";
     if (messageData.username == username) {
         classname = "my-message";
         messageData.username = "you";
     }
-    newDiv.innerHTML = `<p class="${classname}">${messageData.username}: ${messageData.message}</p>`;
+    const fileType = messageData.type.split('/').shift();
+    if (fileType == 'image') {
+        newDiv.innerHTML = `<p class="${classname}">${messageData.username}:<br> <img src="${messageData.message}" width="300" height="240"></p>`;
+    }
+    else if (fileType == "video") {
+        newDiv.innerHTML = `<p class="${classname}">${messageData.username}: <video width="320" height="240" controls> <source src="${messageData.message}" type="video/mp4"></video></p>`;
+    }
+    else if (fileType == "text") {
+        newDiv.innerHTML = `<p class="${classname}">${messageData.username}: ${messageData.message}</p>`;
+    }
+    else {
+        newDiv.innerHTML = `<p class="${classname}">${messageData.username}: <a href="${messageData.message}">FILE</a></p>`;
+    }
     chatContainer.appendChild(newDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
@@ -69,9 +131,9 @@ function getMessages(groupId) {
         // console.log(groupId);
         try {
             const res = yield axios.get(`http://localhost:4000/getMessages?groupId=${groupId}`);
-            console.log(res.data.messages);
+            // console.log(res.data.messages);
             res.data.messages.reverse().filter((element) => {
-                showMessage({ message: element.content, username: element.user.username });
+                showMessage({ message: element.content, username: element.user.username, type: element.type });
             });
         }
         catch (error) {
@@ -86,10 +148,11 @@ window.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void
             displayGroup(element.groupId, res.data.groupNames[index]);
         });
         const element = chatList.firstElementChild.nextSibling;
-        changeActiveBtn(element.id);
+        // changeActiveBtn(element.id);
         if (element) {
             element.className = "btn active";
             socket.emit('join-room', element.id);
+            console.log('joined room:' + element.id);
         }
         getMessages(element.id);
     }
@@ -147,8 +210,10 @@ function addNewGroup(e) {
                 // console.log(res.data);
                 const currActiveBtn = document.querySelector('.active');
                 if (currActiveBtn) {
-                    console.log(currActiveBtn.id);
+                    // console.log(currActiveBtn.id);
                     socket.emit('leave-room', currActiveBtn.id);
+                    console.log('left-room:' + currActiveBtn.id);
+                    console.log(currActiveBtn.id);
                     currActiveBtn.className = 'btn';
                 }
                 displayGroup(res.data.groupId, res.data.groupName);
@@ -157,6 +222,7 @@ function addNewGroup(e) {
                 groupNameInput.value = '';
                 getMessages(res.data.groupId);
                 socket.emit('join-room', res.data.groupId);
+                console.log('joined room:' + res.data.groupId);
             }
             catch (err) {
                 console.log(err);
@@ -177,8 +243,8 @@ function displayGroup(id, groupName) {
     chatName.innerHTML = `<i class="bi bi-people-fill"> </i><span id="${grpBtn.id}">${groupName}</span>`;
     chatList.insertBefore(grpBtn, chatList.firstElementChild.nextSibling);
     chatContainer.innerHTML = '';
-    socket.emit('join-room', grpBtn.id);
-    socket.emit('leave-room', grpBtn.id);
+    // socket.emit('join-room',grpBtn.id);
+    // socket.emit('leave-room', grpBtn.id);
 }
 //function for switching chats
 function changeGroup(id, groupName) {
@@ -197,7 +263,7 @@ function changeActiveBtn(groupId) {
     const currActiveBtn = document.querySelector('.active');
     if (currActiveBtn) {
         socket.emit('leave-room', currActiveBtn.id);
-        console.log(currActiveBtn.id);
+        // console.log(currActiveBtn.id);
         currActiveBtn.className = 'btn';
     }
     localStorage.setItem('groupId', groupId);
@@ -214,7 +280,7 @@ chatHead.addEventListener('click', () => __awaiter(void 0, void 0, void 0, funct
     const getMembers = yield axios.get('http://localhost:4000/getMembers?groupId=' + groupId);
     const groupNameDisplay = document.querySelector('.groupname');
     groupNameDisplay.innerText = groupName;
-    console.log(getMembers.data.userIds);
+    // console.log(getMembers.data.userIds);
     let ind = getMembers.data.userNames.indexOf(username);
     let flag = false;
     if (getMembers.data.userIds[ind].admin)
@@ -243,7 +309,7 @@ chatHead.addEventListener('click', () => __awaiter(void 0, void 0, void 0, funct
 }));
 function removeUser(clickedElement, userId, groupId) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(groupId);
+        // console.log(groupId);
         try {
             const res = yield axios.delete(`http://localhost:4000/removeuser?userId=${userId}&groupId=${groupId}`);
             var h5Element = clickedElement.closest("h5");

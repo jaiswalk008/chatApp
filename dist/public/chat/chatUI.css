@@ -99,6 +99,7 @@ html,body{
 .chat-name{
     min-height: 40px;
     height: fit-content;
+    text-transform: capitalize;
     padding-left: 20px;
     background-color: black;
     border-top-left-radius: 15px;
@@ -122,6 +123,9 @@ html,body{
     margin: 10px;
     color: beige;
     font-size: 1.5rem;
+}
+.class-list > .btn{
+    text-transform: capitalize;
 }
 .bi-x:hover{
     cursor: pointer;

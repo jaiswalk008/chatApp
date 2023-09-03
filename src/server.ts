@@ -43,15 +43,15 @@ server.use(userRoutes);
 server.use(chatRoutes);
 server.use(groupRoutes);
 server.use((req,res) =>{
-    console.log(req.url);
-    res.sendFile(path.join(__dirname,`public${req.url}`));
+    if(req.url=='/') res.redirect('http://localhost:4000/user/signup.html');
+    else res.sendFile(path.join(__dirname,`public${req.url}`));
 });
 
 //socket.io
 
 io.on('connection',(socket) =>{
     console.log(socket.id);
-    socket.on('send-message',(chatMessage:{message:string,groupId:string,username:string}) =>{
+    socket.on('send-message',(chatMessage:{message:string,groupId:string,username:string,type:string}) =>{
         // socket.join(chatMessage.groupId);
         socket.to(chatMessage.groupId).emit("received-message",chatMessage);
         // console.log(chatMessage);

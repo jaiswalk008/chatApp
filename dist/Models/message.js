@@ -19,6 +19,10 @@ const Message = database_1.default.define('message', {
     groupId: {
         type: sequelize_1.default.INTEGER,
         allowNull: false
+    },
+    type: {
+        type: sequelize_1.default.STRING,
+        defaultValue: 'text'
     }
 });
 exports.default = Message;

@@ -47,8 +47,10 @@ server.use(user_1.default);
 server.use(chat_1.default);
 server.use(group_1.default);
 server.use((req, res) => {
-    console.log(req.url);
-    res.sendFile(path_1.default.join(__dirname, `public${req.url}`));
+    if (req.url == '/')
+        res.redirect('http://localhost:4000/user/signup.html');
+    else
+        res.sendFile(path_1.default.join(__dirname, `public${req.url}`));
 });
 //socket.io
 io.on('connection', (socket) => {
@@ -56,7 +58,7 @@ io.on('connection', (socket) => {
     socket.on('send-message', (chatMessage) => {
         // socket.join(chatMessage.groupId);
         socket.to(chatMessage.groupId).emit("received-message", chatMessage);
-        console.log(chatMessage);
+        // console.log(chatMessage);
     });
     socket.on('join-room', (room) => {
         console.log(`User ${socket.id} joined room: ${room}`);
@@ -64,7 +66,7 @@ io.on('connection', (socket) => {
     });
     socket.on('leave-room', (room) => {
         socket.leave(room);
-        console.log(`User ${socket.id} left room: ${room}`);
+        // console.log(`User ${socket.id} left room: ${room}`);
     });
 });
 function startServer() {

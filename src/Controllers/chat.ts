@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Message from '../Models/message';
 import User from '../Models/user';
 // import { Model, Op } from 'sequelize';
-
+import * as S3services from '../services/s3service';
 export const getUserList = async (req:Request,res:Response)=>{
    try{
     const userList =await User.findAll();
@@ -40,3 +40,23 @@ export const getMessages =async (req:Request,res:Response)=>{
     }
     catch(err){console.log(err);}
 }
+export const sendFile = async (req:any, res:Response) => {
+    // const t = await sequelize.transaction();
+    try {
+        const groupId  = req.query.groupId;
+        const file = req.files[0];
+         // console.log(file);
+        const fileURL = await S3services.uploadToS3(file,file.originalname);
+
+        const chat = await req.user.createMessage(
+            {content:fileURL, groupId:groupId,type:file.mimetype},
+           
+        );
+
+        res.status(200).json({ message: chat, status: true });
+
+
+    } catch (err) {
+        console.log(err);
+    }
+};

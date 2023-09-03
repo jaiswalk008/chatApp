@@ -1,6 +1,6 @@
 declare const io:any;
 declare var axios:any;
-const socket: any = io('http://13.235.45.170:4000/');
+const socket: any = io('http://localhost:4000/');
 const token:string = localStorage.getItem('token');
 const username:string = localStorage.getItem('username');
 const chatContainer = document.querySelector('.chat') as HTMLElement;
@@ -11,12 +11,13 @@ const error = document.querySelector('.alert') as HTMLParagraphElement;
 const groupInfo = document.querySelector('.group-info') as HTMLDivElement;
 // const groupBtn= document.querySelector('.active') as HTMLButtonElement;
 messageForm.addEventListener('submit',sendMessage);
+const fileInput = document.getElementById('fileInput') as HTMLInputElement;
 
 socket.on('connect',()=>{
     console.log(socket.id);
 })
-socket.on('received-message',(messageData:{message:string,groupId:string,username:string}) =>{
-    console.log(messageData);
+socket.on('received-message',(messageData:{message:string,groupId:string,username:string,type:string}) =>{
+    // console.log(messageData);
     showMessage(messageData);
   })
 //function for sending message
@@ -25,15 +26,17 @@ async function sendMessage(e:Event){
     const groupBtn= document.querySelector('.active') as HTMLButtonElement;
     
     const formElement = e.target as HTMLFormElement;
+    const message = formElement.message.value;
+    if(message=="") return;
     const chatMessage = {
         message:formElement.message.value,
         groupId: groupBtn.id,
-        username:username
-        
+        username:username,
+        type:"text"
     };
     // console.log(chatMessage);
     try {
-        const res = await axios.post('http://13.235.45.170:4000/sendMessage',chatMessage,{
+        const res = await axios.post('http://localhost:4000/sendMessage',chatMessage,{
             headers:{Authorization:token}
         });
         socket.emit('send-message',chatMessage);
@@ -45,18 +48,71 @@ async function sendMessage(e:Event){
     }
 
 }
+function sendFile() {
+    console.log('clicked send buttm');
+    fileInput.click();
+  }
+  // const imageFileTypes = ['jpeg','jpg','png','gif'];
+    // const videoFileTypes = ['mp4','mkv'];
+  // Add an event listener to the file input element to handle file selection
+fileInput.addEventListener('change',async function () {
+    console.log('input');
+    const selectedFiles = this.files;
+    const currActiveBtn=document.querySelector('.active') as HTMLButtonElement;
+    // Loop through all selected files
+    for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        console.log(file)
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const response = await axios.post(`http://localhost:4000/sendFile?groupId=${currActiveBtn.id}`, formData, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            console.log('in ')
+            console.log(response.data.message);
+            const messageData= {
+                message:response.data.message.content,
+                groupId:currActiveBtn.id,
+                username:username,
+                type:response.data.message.type
+            }
+            console.log(messageData);
+            socket.emit('send-message', messageData);
+            showMessage(messageData)
+            // console.log('Upload successful!');
+        } catch (error) {
+            console.error('Upload failed:', error);
+        }
+    }
+  });
 
 //function for showing message on chat
-function showMessage(messageData:{message:string,username:string}){
-    
-      
+function showMessage(messageData:{message:string,username:string,type:string}){
+    console.log(messageData);
     const newDiv = document.createElement('div');
     let classname="message";
     if(messageData.username==username) {
         classname = "my-message";
         messageData.username="you";
     }
-    newDiv.innerHTML=`<p class="${classname}">${messageData.username}: ${messageData.message}</p>`;
+    const fileType = messageData.type.split('/').shift();
+    if(fileType=='image'){
+        newDiv.innerHTML=`<p class="${classname}">${messageData.username}:<br> <img src="${messageData.message}" width="300" height="240"></p>`;
+    }
+    else if(fileType=="video"){
+        newDiv.innerHTML=`<p class="${classname}">${messageData.username}: <video width="320" height="240" controls> <source src="${messageData.message}" type="video/mp4"></video></p>`;
+    }
+    else if(fileType=="text"){
+        newDiv.innerHTML=`<p class="${classname}">${messageData.username}: ${messageData.message}</p>`;
+    }
+    else{
+        newDiv.innerHTML=`<p class="${classname}">${messageData.username}: <a href="${messageData.message}">FILE</a></p>`;
+    }
     chatContainer.appendChild(newDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight
 }
@@ -66,11 +122,11 @@ async function getMessages(groupId:string){
     // console.log(groupId);
 
     try {
-        const res = await axios.get(`http://13.235.45.170:4000/getMessages?groupId=${groupId}`);
-        console.log(res.data.messages);
+        const res = await axios.get(`http://localhost:4000/getMessages?groupId=${groupId}`);
+        // console.log(res.data.messages);
             
         res.data.messages.reverse().filter((element: any) => {
-            showMessage({message:element.content,username:element.user.username});
+            showMessage({message:element.content,username:element.user.username,type:element.type});
         });      
 
         } catch (error) {
@@ -81,17 +137,18 @@ async function getMessages(groupId:string){
 
 window.addEventListener('DOMContentLoaded',async () =>{
     try{
-        const res = await axios.get('http://13.235.45.170:4000/getGroups',{headers:{Authorization:token}});
+        const res = await axios.get('http://localhost:4000/getGroups',{headers:{Authorization:token}});
 
         res.data.groupIds.filter((element:any,index:number)=>{
             displayGroup(element.groupId,res.data.groupNames[index]);
         })
        
         const element = chatList.firstElementChild.nextSibling as HTMLButtonElement;
-        changeActiveBtn(element.id);
+        // changeActiveBtn(element.id);
         if(element) {
             element.className="btn active";
             socket.emit('join-room',element.id);
+            console.log('joined room:'+element.id);
         }
         
         getMessages(element.id);
@@ -102,7 +159,7 @@ window.addEventListener('DOMContentLoaded',async () =>{
 //function for creating groups
 async function createGroup(){
     try {
-        const res = await axios.get('http://13.235.45.170:4000/getUsers');
+        const res = await axios.get('http://localhost:4000/getUsers');
         userList.innerHTML='';
         res.data.userList.filter((element:any)=> {
             if(element.username!=username) showUserList([element.id, element.username])
@@ -142,15 +199,16 @@ async function addNewGroup(e:Event){
         // got the ids now and also do incliude the users id as well
         // send the userId along with the geoup name to backend
         try{
-            const res =await axios.post('http://13.235.45.170:4000/createGroup',data,{
+            const res =await axios.post('http://localhost:4000/createGroup',data,{
             headers:{Authorization:token}
             });
             // console.log(res.data);
             const currActiveBtn  = document.querySelector('.active') as HTMLButtonElement;
             if(currActiveBtn) {
-                console.log(currActiveBtn.id);
+                // console.log(currActiveBtn.id);
                 socket.emit('leave-room', currActiveBtn.id);
-
+                console.log('left-room:' +currActiveBtn.id);
+                console.log(currActiveBtn.id);
                 currActiveBtn.className='btn';
             }
             displayGroup(res.data.groupId, res.data.groupName);
@@ -159,6 +217,7 @@ async function addNewGroup(e:Event){
             groupNameInput.value='';
             getMessages(res.data.groupId);
             socket.emit('join-room',res.data.groupId);
+            console.log('joined room:'+res.data.groupId);
         }
         catch(err){console.log(err);}
     }
@@ -181,8 +240,8 @@ function displayGroup(id:string, groupName:string){
     
     chatList.insertBefore(grpBtn,chatList.firstElementChild.nextSibling);
     chatContainer.innerHTML='';
-    socket.emit('join-room',grpBtn.id);
-    socket.emit('leave-room', grpBtn.id);
+    // socket.emit('join-room',grpBtn.id);
+    // socket.emit('leave-room', grpBtn.id);
 }
 //function for switching chats
 function changeGroup(id:string,groupName:string){
@@ -202,7 +261,7 @@ function changeActiveBtn(groupId:string){
     const currActiveBtn  = document.querySelector('.active') as HTMLButtonElement;
     if(currActiveBtn) {
         socket.emit('leave-room', currActiveBtn.id);
-        console.log(currActiveBtn.id);
+        // console.log(currActiveBtn.id);
         currActiveBtn.className='btn';
     }
     localStorage.setItem('groupId',groupId);
@@ -221,10 +280,10 @@ chatHead.addEventListener('click',async()=>{
     const memberListContainer = document.querySelector('.member-list') as HTMLDivElement;
     memberListContainer.innerHTML='';
     // console.log(groupName);
-    const getMembers = await axios.get('http://13.235.45.170:4000/getMembers?groupId='+groupId);
+    const getMembers = await axios.get('http://localhost:4000/getMembers?groupId='+groupId);
     const groupNameDisplay = document.querySelector('.groupname') as HTMLParagraphElement;
     groupNameDisplay.innerText=groupName;
-    console.log(getMembers.data.userIds);
+    // console.log(getMembers.data.userIds);
     let ind = getMembers.data.userNames.indexOf(username);
     let flag =false;
     if(getMembers.data.userIds[ind].admin) flag=true;
@@ -251,9 +310,9 @@ chatHead.addEventListener('click',async()=>{
   
 }) 
 async function removeUser(clickedElement:any,userId:string,groupId:string){
-    console.log(groupId);
+    // console.log(groupId);
     try {
-        const res = await axios.delete(`http://13.235.45.170:4000/removeuser?userId=${userId}&groupId=${groupId}`);
+        const res = await axios.delete(`http://localhost:4000/removeuser?userId=${userId}&groupId=${groupId}`);
         
         var h5Element = clickedElement.closest("h5");
         if (h5Element) {
@@ -267,7 +326,7 @@ async function removeUser(clickedElement:any,userId:string,groupId:string){
 }
 async function makeAdmin(userId:string,groupId:string){
     try {
-        const res = await axios.get(`http://13.235.45.170:4000/makeAdmin?userId=${userId}&groupId=${groupId}`);
+        const res = await axios.get(`http://localhost:4000/makeAdmin?userId=${userId}&groupId=${groupId}`);
         const adminBtn= document.getElementById('admin'+userId) as HTMLButtonElement;
         adminBtn.innerText='admin';
     } catch (error) {
