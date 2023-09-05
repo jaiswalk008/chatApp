@@ -21,6 +21,8 @@ const database_1 = __importDefault(require("./util.js/database"));
 const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
 const path_1 = __importDefault(require("path"));
+const cron_1 = require("cron");
+const archivedChat_1 = __importDefault(require("./Controllers/archivedChat"));
 const server = (0, express_1.default)();
 const app = http_1.default.createServer(server);
 const io = new socket_io_1.Server(app);
@@ -69,6 +71,8 @@ io.on('connection', (socket) => {
         // console.log(`User ${socket.id} left room: ${room}`);
     });
 });
+const job = new cron_1.CronJob('00 00 00 * * *', archivedChat_1.default);
+job.start();
 function startServer() {
     return __awaiter(this, void 0, void 0, function* () {
         try {

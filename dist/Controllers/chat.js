@@ -80,7 +80,6 @@ const getMessages = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getMessages = getMessages;
 const sendFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // const t = await sequelize.transaction();
     try {
         const groupId = req.query.groupId;
         const file = req.files[0];

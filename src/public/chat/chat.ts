@@ -20,6 +20,7 @@ socket.on('received-message',(messageData:{message:string,groupId:string,usernam
     // console.log(messageData);
     showMessage(messageData);
   })
+
 //function for sending message
 async function sendMessage(e:Event){
     e.preventDefault();
@@ -52,17 +53,14 @@ function sendFile() {
     console.log('clicked send buttm');
     fileInput.click();
   }
-  // const imageFileTypes = ['jpeg','jpg','png','gif'];
-    // const videoFileTypes = ['mp4','mkv'];
+
   // Add an event listener to the file input element to handle file selection
 fileInput.addEventListener('change',async function () {
     console.log('input');
     const selectedFiles = this.files;
     const currActiveBtn=document.querySelector('.active') as HTMLButtonElement;
     // Loop through all selected files
-    for (let i = 0; i < selectedFiles.length; i++) {
-        const file = selectedFiles[i];
-        console.log(file)
+    Array.from(selectedFiles).filter(async (file) =>{
         try {
             const formData = new FormData();
             formData.append("file", file);
@@ -73,8 +71,8 @@ fileInput.addEventListener('change',async function () {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            console.log('in ')
-            console.log(response.data.message);
+            // console.log('in ')
+            // console.log(response.data.message);
             const messageData= {
                 message:response.data.message.content,
                 groupId:currActiveBtn.id,
@@ -87,8 +85,8 @@ fileInput.addEventListener('change',async function () {
             // console.log('Upload successful!');
         } catch (error) {
             console.error('Upload failed:', error);
-        }
-    }
+        }  
+    })
   });
 
 //function for showing message on chat
@@ -105,13 +103,13 @@ function showMessage(messageData:{message:string,username:string,type:string}){
         newDiv.innerHTML=`<p class="${classname}">${messageData.username}:<br> <img src="${messageData.message}" width="300" height="240"></p>`;
     }
     else if(fileType=="video"){
-        newDiv.innerHTML=`<p class="${classname}">${messageData.username}: <video width="320" height="240" controls> <source src="${messageData.message}" type="video/mp4"></video></p>`;
+        newDiv.innerHTML=`<p class="${classname}">${messageData.username}: <br> <video width="320" height="240" controls> <source src="${messageData.message}" type="video/mp4"></video></p>`;
     }
     else if(fileType=="text"){
         newDiv.innerHTML=`<p class="${classname}">${messageData.username}: ${messageData.message}</p>`;
     }
     else{
-        newDiv.innerHTML=`<p class="${classname}">${messageData.username}: <a href="${messageData.message}">FILE</a></p>`;
+        newDiv.innerHTML=`<p class="${classname}">${messageData.username}:<br> <a href="${messageData.message}">FILE</a></p>`;
     }
     chatContainer.appendChild(newDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight
@@ -151,7 +149,7 @@ window.addEventListener('DOMContentLoaded',async () =>{
             console.log('joined room:'+element.id);
         }
         
-        getMessages(element.id);
+        getMessages(element.id); 
     }
     catch(err) {console.log(err);}
     
@@ -212,12 +210,14 @@ async function addNewGroup(e:Event){
                 currActiveBtn.className='btn';
             }
             displayGroup(res.data.groupId, res.data.groupName);
+          
             const element = chatList.firstElementChild.nextSibling as HTMLButtonElement;
             element.className="btn active";
-            groupNameInput.value='';
-            getMessages(res.data.groupId);
-            socket.emit('join-room',res.data.groupId);
-            console.log('joined room:'+res.data.groupId);
+            element.click();
+            // groupNameInput.value='';
+            // getMessages(res.data.groupId);
+            // socket.emit('join-room',res.data.groupId);
+            // console.log('joined room:'+res.data.groupId);
         }
         catch(err){console.log(err);}
     }
@@ -255,6 +255,7 @@ function changeGroup(id:string,groupName:string){
     getMessages(id);
     chatContainer.innerHTML='';
     socket.emit('join-room',id);
+    console.log('joined-room'+id);
 } 
 
 function changeActiveBtn(groupId:string){

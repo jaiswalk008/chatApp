@@ -7,7 +7,8 @@ import sequelize from './util.js/database';
 import http from 'http';
 import {Server} from 'socket.io';
 import path from 'path';
-
+import { CronJob } from 'cron';
+import backup from './Controllers/archivedChat';
 const server = express();
 
 const app = http.createServer(server);
@@ -65,8 +66,12 @@ io.on('connection',(socket) =>{
         socket.leave(room);
         // console.log(`User ${socket.id} left room: ${room}`);
     });
-      
+ 
 })
+
+//backup will start at
+const job = new CronJob('00 00 00 * * *', backup);
+job.start();
 
 async function startServer (){
     try{

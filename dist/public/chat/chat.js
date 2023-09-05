@@ -60,8 +60,6 @@ function sendFile() {
     console.log('clicked send buttm');
     fileInput.click();
 }
-// const imageFileTypes = ['jpeg','jpg','png','gif'];
-// const videoFileTypes = ['mp4','mkv'];
 // Add an event listener to the file input element to handle file selection
 fileInput.addEventListener('change', function () {
     return __awaiter(this, void 0, void 0, function* () {
@@ -69,9 +67,7 @@ fileInput.addEventListener('change', function () {
         const selectedFiles = this.files;
         const currActiveBtn = document.querySelector('.active');
         // Loop through all selected files
-        for (let i = 0; i < selectedFiles.length; i++) {
-            const file = selectedFiles[i];
-            console.log(file);
+        Array.from(selectedFiles).filter((file) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const formData = new FormData();
                 formData.append("file", file);
@@ -81,8 +77,8 @@ fileInput.addEventListener('change', function () {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                console.log('in ');
-                console.log(response.data.message);
+                // console.log('in ')
+                // console.log(response.data.message);
                 const messageData = {
                     message: response.data.message.content,
                     groupId: currActiveBtn.id,
@@ -97,7 +93,7 @@ fileInput.addEventListener('change', function () {
             catch (error) {
                 console.error('Upload failed:', error);
             }
-        }
+        }));
     });
 });
 //function for showing message on chat
@@ -114,13 +110,13 @@ function showMessage(messageData) {
         newDiv.innerHTML = `<p class="${classname}">${messageData.username}:<br> <img src="${messageData.message}" width="300" height="240"></p>`;
     }
     else if (fileType == "video") {
-        newDiv.innerHTML = `<p class="${classname}">${messageData.username}: <video width="320" height="240" controls> <source src="${messageData.message}" type="video/mp4"></video></p>`;
+        newDiv.innerHTML = `<p class="${classname}">${messageData.username}: <br> <video width="320" height="240" controls> <source src="${messageData.message}" type="video/mp4"></video></p>`;
     }
     else if (fileType == "text") {
         newDiv.innerHTML = `<p class="${classname}">${messageData.username}: ${messageData.message}</p>`;
     }
     else {
-        newDiv.innerHTML = `<p class="${classname}">${messageData.username}: <a href="${messageData.message}">FILE</a></p>`;
+        newDiv.innerHTML = `<p class="${classname}">${messageData.username}:<br> <a href="${messageData.message}">FILE</a></p>`;
     }
     chatContainer.appendChild(newDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -219,10 +215,11 @@ function addNewGroup(e) {
                 displayGroup(res.data.groupId, res.data.groupName);
                 const element = chatList.firstElementChild.nextSibling;
                 element.className = "btn active";
-                groupNameInput.value = '';
-                getMessages(res.data.groupId);
-                socket.emit('join-room', res.data.groupId);
-                console.log('joined room:' + res.data.groupId);
+                element.click();
+                // groupNameInput.value='';
+                // getMessages(res.data.groupId);
+                // socket.emit('join-room',res.data.groupId);
+                // console.log('joined room:'+res.data.groupId);
             }
             catch (err) {
                 console.log(err);
@@ -258,6 +255,7 @@ function changeGroup(id, groupName) {
     getMessages(id);
     chatContainer.innerHTML = '';
     socket.emit('join-room', id);
+    console.log('joined-room' + id);
 }
 function changeActiveBtn(groupId) {
     const currActiveBtn = document.querySelector('.active');

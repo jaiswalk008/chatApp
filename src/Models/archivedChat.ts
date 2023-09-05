@@ -1,0 +1,31 @@
+import Sequelize, { TEXT } from 'sequelize';
+import sequelize from '../util.js/database';
+
+const ArchivedChat = sequelize.define('archivedchat',{
+    id:{
+        type:Sequelize.INTEGER,
+        allowNull:false,
+        primaryKey:true,
+        autoIncrement:true
+    },
+    content:{
+        type:Sequelize.TEXT,
+        allowNull:false
+
+    },
+    groupId:{
+        type:Sequelize.INTEGER,
+        allowNull:false
+    },
+    userId:{
+        type:Sequelize.INTEGER,
+        allowNull:false
+    },
+    type:{
+        type:Sequelize.STRING,
+        defaultValue:'text'
+    }
+
+
+})
+export default ArchivedChat;

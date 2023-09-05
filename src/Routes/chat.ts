@@ -2,7 +2,7 @@ import {Router} from 'express';
 import * as messageController from '../Controllers/chat';
 import authenticate from '../middlewares/auth'
 const router: Router = Router();
-const multer = require('multer');
+import multer from 'multer';
 const storage = multer.memoryStorage();
 const uploads = multer({storage});
 

@@ -41,7 +41,7 @@ export const getMessages =async (req:Request,res:Response)=>{
     catch(err){console.log(err);}
 }
 export const sendFile = async (req:any, res:Response) => {
-    // const t = await sequelize.transaction();
+   
     try {
         const groupId  = req.query.groupId;
         const file = req.files[0];
