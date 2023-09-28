@@ -10,9 +10,7 @@ const backup = async () => {
         await archiveChat.bulkCreate(data);
 
        
-        for (const message of data) {
-            await message.destroy();
-        }
+        await Message.truncate();
 
         console.log('Backup Done', new Date());
     } catch (err) {
