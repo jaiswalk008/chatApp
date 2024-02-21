@@ -17,7 +17,7 @@ export const sendMessage = async (req:any,res:Response) =>{
     try {
         
         const result =await req.user.createMessage({content:text, groupId:req.body.groupId}); 
-        res.status(200).json({message:text});
+        res.status(200).json(result);
     } catch (error) {
         console.log(error);
     }
@@ -32,8 +32,8 @@ export const getMessages =async (req:Request,res:Response)=>{
             include: [
                 { model: User, attributes: ['username'] }
             ],
-            order: [['createdAt', 'DESC']],
-            limit:20
+            // order: [['createdAt', 'DESC']],      
+            // limit:20
             });
         // console.log(messages); 
         res.status(200).json({messages:messages});

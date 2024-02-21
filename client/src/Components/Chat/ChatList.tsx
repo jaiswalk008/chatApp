@@ -53,7 +53,6 @@ const ChatList= (props:any) =>{
                         </div>
                     ) 
                     
-            
                 })}
             </div>
         </div>
