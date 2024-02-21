@@ -7,10 +7,11 @@ export type user={
     userName: string;
     email:string
 }
-const UserList = () =>{
+const UserList = (props:{removeSelectedUsersList:Boolean}) =>{
     const dispatch = useDispatch();
+    //list of ll the users in the database
     const {usersList} = useSelector((state:any) => state.auth);
-    
+    //users available for selection
     const [userList, setUserList] = useState<user[]>([]);
     const [username, setUsername] = useState('');
     const [selectedUsers, setSelectedUser] = useState<user[]>([]);
@@ -61,6 +62,13 @@ const UserList = () =>{
         }   
         fetchUsers();
     },[dispatch])
+    useEffect(() =>{
+        if(props.removeSelectedUsersList){
+            setSelectedUser([]);
+            setUserList(usersList);
+        }
+        
+    },[props.removeSelectedUsersList])
     return (
        <>
             <span>

@@ -38,23 +38,24 @@ html,body{
 }
 #enter-message{
     background-color: #353a47;
+    margin: 0 5px 0 5px;
 }
-.message{
+.other{
     padding: 3px 5px;
-    border: 2px solid #353a47;
+    border: 2px solid #555b69;
     border-radius: 10px;
     width: fit-content;
-    margin: 5px 0;
+    margin: 5px 5px ;
     float: left;
 }
-.my-message{
+.self{
     padding: 3px 5px;
-    border: 2px solid #353a47;
+    border: 2px solid #555b69;
     background-color:#353a47 ;
     border-radius: 10px;
     width: fit-content; 
     float: right !important;
-    margin: 5px 0;
+    margin: 5px 5px;
 }
 .alert{
     background-color: red;
@@ -137,9 +138,22 @@ html,body{
 }
 .chat{
     overflow-y: auto;
+    scrollbar-width: thin; 
+    scrollbar-color: #06032b #f0f0f0; 
+   
+}
+&::-webkit-scrollbar {
+    width: 8px;
 }
 
-body{
+&::-webkit-scrollbar-thumb {
+    background-color: #06032b;
+}
+
+&::-webkit-scrollbar-track {
+    background-color: #f0f0f0;
+}
+body{   
     color: beige;
     background: #353a47;
 
@@ -162,4 +176,3 @@ body{
     cursor: pointer;
     border: 1px solid white;
 }
- 

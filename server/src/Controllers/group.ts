@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import User from '../Models/user';
 import Group from '../Models/group';
 import UserGroup from '../Models/userGroup';
-import { Model } from "sequelize";
+import { UserInterface } from "../Models/interface";
 export const addGroup = async (req: any, res: Response) => {
-    const groupDetails: { groupName: string, userIds: number[] } = { ...req.body };
-    groupDetails.userIds.push(req.user.id);
+    const groupDetails: { groupName: string, userList: UserInterface[] } = { ...req.body };
+    groupDetails.userList.push(req.user);
     // console.log(groupDetails);
     try {
         // Create the group
@@ -14,15 +14,15 @@ export const addGroup = async (req: any, res: Response) => {
         });
 
         // Create associations between users and the group
-        for (const userId of groupDetails.userIds) {
+        for (const user of groupDetails.userList) {
             let admin=false;
-            if(userId==req.user.id) admin=true
+            if(user.id==req.user.id) admin=true
             const userGroup = await UserGroup.create({
-                userId,
+                userId:user.id,
                 groupId: group.id,
                 admin:admin
             });
-            // console.log(userGroup);
+            console.log(userGroup);
         }
         
         res.status(201).json({ message: 'Group created successfully' , groupId:group.id , groupName:groupDetails.groupName});
@@ -39,15 +39,15 @@ export const getGroups = async (req:any,res:Response) =>{
         });
         //map and filter functions do not wait for async ops to get completed
         //rather they return promises and these promises need to be resolved
-        const groupNamesPromises = groupIds.map(async (groupData: any) => {
+        const groupDetailsPromises = groupIds.map(async (groupData: any) => {
             const group:any = await Group.findByPk(groupData.groupId);
-            return group.groupname;
+            return {groupName: group.groupname,groupId:groupData.groupId};
         });
         
-        const groupNames = await Promise.all(groupNamesPromises);
+        const groupDetails = await Promise.all(groupDetailsPromises);
         
         
-        res.status(201).json({groupIds:groupIds,groupNames:groupNames});
+        res.status(201).json({groupDetails});
     }catch(err){console.log(err);}
 }
 export const getMembers = async (req:any , res:Response) =>{
