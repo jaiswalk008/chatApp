@@ -17,6 +17,7 @@ export const sendMessage = async (req:any,res:Response) =>{
     try {
         
         const result =await req.user.createMessage({content:text, groupId:req.body.groupId}); 
+        
         res.status(200).json(result);
     } catch (error) {
         console.log(error);
