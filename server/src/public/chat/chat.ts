@@ -56,7 +56,7 @@ function sendFile() {
 
   // Add an event listener to the file input element to handle file selection
 fileInput.addEventListener('change',async function () {
-    console.log('input');
+    
     const selectedFiles = this.files;
     const currActiveBtn=document.querySelector('.active') as HTMLButtonElement;
     // Loop through all selected files

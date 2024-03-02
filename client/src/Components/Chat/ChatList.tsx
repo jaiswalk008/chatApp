@@ -1,25 +1,30 @@
 import { useCallback, useEffect } from "react";
 import CreateGroup from "./CreateGroup";
-import { user } from "./UserList";
+ 
 import { useDispatch, useSelector } from "react-redux";
 import { chatActions } from "../Context/store";
 import { Group } from "../Context/chat";
 import axios from "axios";
+import useSocket from "./chat/useSocket";
 const ChatList= (props:any) =>{
     const dispatch = useDispatch();
     const {groups} = useSelector((state:any) => state.chat);    
-    const {currentGroupList} = useSelector((state:any) => state.chat);
+    const {currentGroupList , currentGroup} = useSelector((state:any) => state.chat);
     const {token} = useSelector((state:any) => state.auth);
+    const socket = useSocket();
     const createGroupHandler = useCallback((groupDetails:{groupName:string, groupId:number}) =>{
       
         dispatch(chatActions.addTogroup({groupName:groupDetails.groupName, groupId:groupDetails.groupId ,currentGroupList}));
         dispatch(chatActions.setCurrentGroupList([]));
         dispatch(chatActions.setCurrentGroup(groupDetails));
         document.getElementById('close')?.click();
-    },[dispatch])
+    },[dispatch,currentGroupList])
 
     const showChat = (group:Group) =>{
+       
+        socket.emit('leave-room',currentGroup.groupId);
         dispatch(chatActions.setCurrentGroup(group));
+        dispatch(chatActions.setCurrentGroupList([]));
     }
     useEffect(() =>{
         const fetchGroups = async () =>{
@@ -27,16 +32,16 @@ const ChatList= (props:any) =>{
                 const res = await axios.get('http://localhost:5000/getGroups',{
                     headers:{Authorization:token}
                 })
-                console.log(res.data);
+                // console.log(res.data);
                 dispatch(chatActions.setGroup(res.data.groupDetails.reverse()));
                 // dispatch(chatActions.setCurrentGroup({groupName:groups[0].groupName , groupId:groups[0].groupId}))
-                console.log(groups[0])
+                // console.log(groups[0])
             }catch(err){
                 console.log(err)
             }
         }
         fetchGroups();
-    },[token])
+    },[token,dispatch])
     return (
         <div className="container group-list d-flex justify-content-start flex-column" >    
             <div className="d-flex ">

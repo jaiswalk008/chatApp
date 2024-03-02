@@ -119,8 +119,7 @@ html,body{
     border-radius: 10px;
     margin-left: 2px;
     height: 100%;
-    display: none; 
-}
+ }
 .bi-people-fill{
     
     padding:0px 5px;
@@ -175,4 +174,11 @@ body{
 .group:hover{
     cursor: pointer;
     border: 1px solid white;
+}
+.bi-pen{
+    margin-left: 10px;
+}
+.bi-pen:hover{
+    cursor:pointer;
+    color: blue;
 }

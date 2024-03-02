@@ -24,7 +24,7 @@ const UserList = (props:{removeSelectedUsersList:Boolean}) =>{
                 if(user.userName===username){
                      userFound=true;
                     const updatedUsersList = [...selectedUsers,user];
-                    console.log(updatedUsersList);
+                    // console.log(updatedUsersList);
                     dispatch(chatActions.setCurrentGroupList(updatedUsersList))
 
                     setSelectedUser(prev => [...updatedUsersList]);

@@ -22,16 +22,16 @@ const Login = () => {
             email:email,
             password:password,
         }
-        console.log(userDetails);
+        // console.log(userDetails);
         try{
             const res = await axios.post('http://localhost:5000/login',userDetails);
-            console.log(res.data);
+            // console.log(res.data);
             dispatch(authActions.addToken(res.data.token));
             localStorage.setItem('username',res.data.username);
             navigate('/');
         }
         catch(err:any){
-            console.log(err);
+            // console.log(err);
             setErrorMessage(err.response.data.message);
         }
 

@@ -22,8 +22,8 @@ const CreateGroup = (props:any) =>{
                 const res =await axios.post('http://localhost:5000/createGroup',{groupName, userList:currentGroupList},{
                     headers:{'Authorization':token}
                 })
-                console.log(res.data);
-                console.log(currentGroupList)
+                // console.log(res.data);
+                // console.log(currentGroupList)
                 props.onCreateHandler(res.data);
                 setGroupName('');
                 setErrorMessage('');

@@ -60,7 +60,7 @@ export const getMembers = async (req:any , res:Response) =>{
         
         const userNamePromises = userIds.map(async (userData: any) => {
             const user:any = await User.findByPk(userData.userId);
-            return user.username;
+            return user.userName;
         });
         
         const userNames = await Promise.all(userNamePromises);
@@ -97,4 +97,15 @@ export const makeAdmin = async(req:any,res:Response)=>{
     } catch (error) {
         console.log(error);
     }
+}
+export const updateGroupName = async (req:Request , res:Response) =>{
+    const groupName = req.query.groupName;
+    const groupId = req.query.id;
+    try{
+        await Group.update(
+            {groupname:groupName},
+            {where:{id:groupId}}
+        )
+    }
+    catch(err){console.log(err);}
 }

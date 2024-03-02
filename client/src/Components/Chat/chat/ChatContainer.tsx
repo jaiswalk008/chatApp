@@ -12,8 +12,7 @@ const ChatContainer = (props:any) =>{
 
     return(
         <div className="h-75 chat d-flex justify-content-start flex-column " ref={chatContainerRef}>
-            {/* <div><p className="self">You: hello</p></div>
-            <div className="other">user: Hi</div> */}
+       
             {props.messages.map((element:any)=>{
                const user = username===element.user.username ? 'you' : element.user.username;
                 return (

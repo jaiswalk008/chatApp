@@ -1,30 +1,44 @@
 import ChatHeader from "./ChatHeader";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Footer from "./Footer";
 import ChatContainer from "./ChatContainer";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import '../Chat.css'
+import useSocket from "./useSocket";
 const Chat = (props:any) => {
     const username = localStorage.getItem('username');
     const [messages , setMessages] = useState<any>([]);
     const {currentGroup} = useSelector((state:any) => state.chat);
     const {token} = useSelector((state:any) => state.auth);
-    const sendMessageHandler = async (message:any)=>{
+    const socket = useSocket();
+
+    const sendMessageHandler = useCallback(async (message:any)=>{
         const messageDetails = {message,groupId:currentGroup.groupId}
         try{
             const res = await axios.post('http://localhost:5000/sendMessage',messageDetails,{
                 headers:{Authorization:token}
             });
             console.log(res);
-            const updatedMessagesList = [...messages , {...res.data,username}];
-            console.log(updatedMessagesList);
+            const updatedMessagesList = [...messages , {...res.data,user:{username}}];
+            // console.log(updatedMessagesList);
             setMessages(updatedMessagesList);
+            socket.emit('send-message',{...res.data,user:{username}})
         }
         catch(err){
             console.log(err);
         }
-    }
+    },[socket,token,messages,username,currentGroup.groupId])
+
+    const displayReceivedMessage = useCallback(((message:any)=>{
+        if(message.groupId===currentGroup.groupId){
+            const updatedMessagesList = [...messages , {...message}];
+            // console.log(updatedMessagesList);
+            setMessages(updatedMessagesList);
+            // console.log(message)
+        }
+    
+    }),[currentGroup.groupId, messages])
     useEffect(()=>{
         const fetchMessages = async () =>{
             try {
@@ -37,6 +51,29 @@ const Chat = (props:any) => {
         }
         fetchMessages();
     },[currentGroup.groupId])
+
+    useEffect(() =>{
+        socket.on('connect',() =>{
+            console.log(socket.id);
+            
+            
+        })
+        socket.on('receive-message',displayReceivedMessage)
+        return () =>{
+            socket.off('connect',()=> console.log('connected'))
+            
+            socket.off('receive-message', displayReceivedMessage)
+        }
+    },[socket,messages,displayReceivedMessage])
+
+    useEffect(() =>{
+        socket.emit('join-room',currentGroup.groupId);
+        console.log(currentGroup.groupId)
+        return ()=>{
+            socket.off('join-room', ()=> console.log('joined'));
+        }
+    },[currentGroup.groupId,socket])
+
     return (
         <div className="container conversation w-75">
             <ChatHeader/>
