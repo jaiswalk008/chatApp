@@ -9,7 +9,7 @@ const ChatHeader = () =>{
     const showGroupDescription = async (groupId:number) =>{
         try {
             const res =await axios.get('http://localhost:5000/getMembers?groupId='+groupId);
-            // console.log(res.data);
+            console.log(res.data);
             const groupDetails = res.data.userIds.map((element:any,index:number) =>{
                 return {...element , userName:res.data.userNames[index]}
             })

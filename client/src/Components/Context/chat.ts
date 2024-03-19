@@ -59,6 +59,9 @@ const chatSlice = createSlice({
                 }
 
             })
+        },
+        removeUser(state,action){
+           state.currentGroupList  = state.currentGroupList.filter((element:any) => element.userId!==action.payload)
         }
     }
 })
