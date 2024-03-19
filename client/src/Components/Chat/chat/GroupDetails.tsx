@@ -5,7 +5,7 @@ import { chatActions } from "../../Context/store";
 import { useState } from "react";
 
 const GroupDetails = () => {
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState<boolean>(false);
   const { currentGroup, currentGroupList } = useSelector(
     (state: any) => state.chat
   );
@@ -76,6 +76,7 @@ const GroupDetails = () => {
           <i onClick={handleEditState} className="bi bi-pen"></i>
         </>
       )}
+      
       <hr style={{ color: "white" }} />
       <div>
         <p className="group-members text-center mt-2">

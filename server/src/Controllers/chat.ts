@@ -46,16 +46,16 @@ export const sendFile = async (req:any, res:Response) => {
     try {
         const groupId  = req.query.groupId;
         const file = req.files[0];
-         // console.log(file);
+        console.log(file);
+        console.log(groupId);
         const fileURL = await S3services.uploadToS3(file,file.originalname);
 
-        const chat = await req.user.createMessage(
+        const message = await req.user.createMessage(
             {content:fileURL, groupId:groupId,type:file.mimetype},
            
         );
 
-        res.status(200).json({ message: chat, status: true });
-
+        res.status(200).json({ message, status: true });
 
     } catch (err) {
         console.log(err);

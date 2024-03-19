@@ -1,7 +1,11 @@
+import axios from "axios";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 const Footer = (props:any) =>{
     const [message,setMessage] = useState('');
+    const {currentGroup} = useSelector((state:any)=>state.chat);
+    const {token} = useSelector((state:any)=>state.auth);
     const sendFile = () =>{
         const fileInput = document.getElementById('fileInput') as HTMLInputElement; 
         fileInput.click();
@@ -15,15 +19,21 @@ const Footer = (props:any) =>{
        }
     }
     const sendFileHandler = async (e:any) =>{
-        const selectedFiles = e.target.files[0];
-        console.log(selectedFiles);
+        const selectedFile = e.target.files[0];
+        console.log(selectedFile);
         try{
-            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            const res = await axios.post('http://localhost:5000/sendFile?groupId='+currentGroup.groupId,formData,{
+                headers:{Authorization:token}
+            });
+            console.log(res);
         }catch(err){
             console.log(err);
         
         }
     }
+
     return (
         <div className="d-flex">
                 <button onClick={sendFile} className="btn btn-secondary ms-1"><i className="bi text-light bi-folder-symlink-fill"></i></button>
