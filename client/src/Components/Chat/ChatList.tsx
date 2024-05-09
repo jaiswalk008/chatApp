@@ -51,7 +51,7 @@ const ChatList= (props:any) =>{
             <div className="d-flex class-list flex-column overflow-auto">
             
                 <header className="text-white fw-bold fs-5">Chats</header>
-                {groups.map((group:Group) =>{
+                {groups.length>0 && groups.map((group:Group) =>{
                     return (
                         <div className="group" onClick={() => showChat(group)}  key={group.groupId}>
                             {group.groupName}

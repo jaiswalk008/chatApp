@@ -10,7 +10,7 @@ const GroupDetails = () => {
     (state: any) => state.chat
   );
 //   console.log(currentGroup);
-  const [groupName, setGroupName] = useState(currentGroup.groupName);
+  const [groupName, setGroupName] = useState(currentGroup?.groupName);
   const currentUserName = localStorage.getItem("username");
   const dispatch = useDispatch();
 
@@ -72,12 +72,12 @@ const GroupDetails = () => {
         </div>
       ) : (
         <>
-          <span>{currentGroup.groupName}</span>
+          <span>{currentGroup?.groupName}</span>
           <i onClick={handleEditState} className="bi bi-pen"></i>
         </>
       )}
       
-      <hr style={{ color: "white" }} />
+      <hr style={{ color: "white" }} /> 
       <div>
         <p className="group-members text-center mt-2">
           Group members: {currentGroupList.length}

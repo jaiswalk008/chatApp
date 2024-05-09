@@ -16,7 +16,7 @@ const CreateGroup = (props:any) =>{
     const createGroupHander = async ()=>{
         
         if(groupName==='') setErrorMessage('Enter group name');
-        else if(currentGroupList.length===0) setErrorMessage('Please add atleast one user');
+        else if(currentGroupList?.length===0) setErrorMessage('Please add atleast one user');
         else {
             try {
                 const res =await axios.post('http://localhost:5000/createGroup',{groupName, userList:currentGroupList},{

@@ -6,13 +6,14 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import '../Chat.css'
 import useSocket from "./useSocket";
+
 const Chat = (props:any) => {
     const username = localStorage.getItem('username');
     const [messages , setMessages] = useState<any>([]);
     const {currentGroup} = useSelector((state:any) => state.chat);
     const {token} = useSelector((state:any) => state.auth);
     const socket = useSocket();
-
+     
     const sendMessageHandler = useCallback(async (message:any)=>{
         const messageDetails = {message,groupId:currentGroup.groupId}
         try{
@@ -20,17 +21,19 @@ const Chat = (props:any) => {
                 headers:{Authorization:token}
             });
             console.log(res);
-            const updatedMessagesList = [...messages , {...res.data,user:{username}}];
-            // console.log(updatedMessagesList);
-            setMessages(updatedMessagesList);
+            // const updatedMessagesList = [...messages , {...res.data,user:{username}}];
+          
+            // setMessages(updatedMessagesList);
             socket.emit('send-message',{...res.data,user:{username}})
         }
         catch(err){
             console.log(err);
         }
-    },[socket,token,messages,username,currentGroup.groupId])
+    },[socket,token,messages,username,currentGroup])
 
     const displayReceivedMessage = useCallback(((message:any)=>{
+        console.log('helo');
+        console.log(message);
         if(message.groupId===currentGroup.groupId){
             const updatedMessagesList = [...messages , {...message}];
             // console.log(updatedMessagesList);
@@ -38,11 +41,11 @@ const Chat = (props:any) => {
             // console.log(message)
         }
     
-    }),[currentGroup.groupId, messages])
+    }),[currentGroup, messages])
     useEffect(()=>{
         const fetchMessages = async () =>{
             try {
-                const res = await axios.get('http://localhost:5000/getMessages?groupId='+currentGroup.groupId);
+                const res = await axios.get('http://localhost:5000/getMessages?groupId='+currentGroup?.groupId);
                 console.log(res.data);
                 setMessages(res.data.messages);
             } catch (error) {
@@ -50,7 +53,7 @@ const Chat = (props:any) => {
             }
         }
         fetchMessages();
-    },[currentGroup.groupId])
+    },[currentGroup])
 
     useEffect(() =>{
         socket.on('connect',() =>{
@@ -67,19 +70,27 @@ const Chat = (props:any) => {
     },[socket,messages,displayReceivedMessage])
 
     useEffect(() =>{
-        socket.emit('join-room',currentGroup.groupId);
-        console.log(currentGroup.groupId)
+        socket.emit('join-room',{groupId:currentGroup?.groupId,username});
+        
         return ()=>{
             socket.off('join-room', ()=> console.log('joined'));
         }
-    },[currentGroup.groupId,socket])
+    },[currentGroup,socket])
 
     return (
-        <div className="container conversation w-75">
-            <ChatHeader/>
-            <ChatContainer messages={messages} />
-            <Footer onSendMessage = {sendMessageHandler}/>
-        </div>
-    )
+        
+          currentGroup ? (
+            <div className="container conversation w-75">
+              <ChatHeader />
+              <ChatContainer messages={messages} />
+              <Footer onSendMessage={sendMessageHandler}/>
+            </div>
+          ) : (
+            <h1>You are not a part of any group</h1>
+          )
+       
+      );
+      
+      
 }
 export default Chat;
